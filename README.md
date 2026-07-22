@@ -16,6 +16,7 @@ npx skills add vishhvak/skills/skill-engineering
 
 | Skill | What it does |
 | --- | --- |
+| [blueprint](skills/blueprint) | Structure repos like strong OSS projects: init after brainstorming, restructure existing repos, artifact hygiene (what stays out of git), AGENTS.md authoring, TS/Python/Rust layout doctrine. Ships a hygiene script whose output is the instruction. |
 | [skill-engineering](skills/skill-engineering) | Write, upgrade, or audit agent skills so they beat the median — harness machinery (sub-agents, hooks, scripts, routing, memory) plus the prose discipline inside SKILL.md. |
 
 [![skills.sh](https://skills.sh/b/vishhvak/skills)](https://skills.sh/vishhvak/skills)
