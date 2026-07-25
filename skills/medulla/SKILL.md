@@ -1,15 +1,15 @@
 ---
-name: sutra
+name: medulla
 description: Density editing — revise prose until a maximally faithful compression of it must drop ideas. For essays, blog posts, READMEs, docs, talks, and any draft that reads long but says little. Use when asked to "make this denser", "tighten this", "cut the fluff", "make every word earn its place", "make it unsummarizable", or to judge whether a draft is worth its length.
 ---
 
-# sutra
+# medulla
 
-A sutra is an aphorism compressed until not one syllable can be removed — the
-Sanskrit grammarians held that an author would sooner give up a son than a
-syllable. Sutra prose has that property: so little slack remains that even a
-compression built to keep everything must drop ideas to get shorter. It is
-unsummarizable, because every summary of it is strictly worse.
+The medulla is the marrow — the living core inside the bone, and the word
+Latin reached for when it meant the innermost essence of a thing. Prose cut to
+the medulla is all core: so little slack remains that even a compression built
+to keep everything must drop ideas to get shorter. It cannot be summarized,
+because every summary of it is strictly worse.
 
 Summarizers never measure what they lose — they cut by a fixed fraction and
 hope. This skill turns that flaw into an instrument, with one correction that
