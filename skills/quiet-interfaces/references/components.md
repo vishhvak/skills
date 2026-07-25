@@ -142,16 +142,138 @@ The signature scrollytelling move:
 
 ## 5. Hand-built charts (`*-chart.tsx` pattern)
 
-- No chart libraries. Bars are divs; scales from `d3-scale`'s `scaleLinear`.
-- Entrance: `motion.div` `initial={{height: 0}}`
-  `whileInView={{height: countToHeight(v)}}` `transition={{delay: index * 0.05}}`
-  (staggered left-to-right; two series use 0.05 and 0.1).
-- Series pairing: saturated + 200-tint of the same hue (`bg-blue-500` fill vs
-  `bg-blue-200` total), `w-5 rounded-md` bars.
-- Hover: transparent overlay ring `border-2 border-zinc-300 dark:border-zinc-700
-  rounded-xl` fading in `opacity 0→1` behind the hovered bar.
-- Axis ticks computed by `Math.ceil(max / 5)` steps; labels `text-xs
-  text-zinc-500`.
+No chart libraries. Bars are divs; scales come from `d3-scale`'s
+`scaleLinear`. The reference implementation is a vertical two-series bar
+chart, and the details below are the ones that go wrong when improvised.
+
+### Geometry (exact)
+
+```
+maxHeight  = 256                        // px, the tallest a bar may draw
+plotHeight = 292                        // px, container: 256 + 36 for x labels
+countToHeight = scaleLinear().domain([0, maxCount]).range([0, maxHeight])
+```
+
+- Shell: `bg-zinc-100 dark:bg-zinc-800 rounded-lg p-6 pt-8 flex flex-col
+  gap-6 w-full`. The whole chart is one `<button type="button">` so it is a
+  single hover surface (and stays keyboard-reachable).
+- Plot row: `flex flex-row h-[292px]`, then a y-axis rail `relative w-12`,
+  then bars in `flex flex-row justify-between w-full`.
+- Bar column: `flex flex-col items-center gap-4 relative`, with the x-axis
+  label as the **last child** (`text-sm text-zinc-600 dark:text-zinc-300`).
+  Bars are lifted off the baseline by `bottom: 36`–`40` so the label sits
+  clear beneath them — that offset is what keeps the axis text from
+  colliding with the bars.
+
+### Two series is a stack of layers, never a nest
+
+This is the one that gets built wrong. Both bars are the **same width**, the
+total sits **in flow**, and the subset is **absolutely positioned on top**:
+
+```jsx
+{/* FRONT — the subset. Absolute, z-20, saturated. */}
+<motion.div
+  className="w-5 bg-blue-500 z-20 rounded-md mt-auto absolute pointer-events-none"
+  initial={{ height: 0 }}
+  whileInView={{ height: countToHeight(subset) }}
+  style={{ bottom: 36 }}
+  transition={{ delay: index * 0.1 }}
+/>
+{/* BACK — the total. In flow, same width, 200-tint of the same hue. */}
+<motion.div
+  className="w-5 bg-blue-200 rounded-md mt-auto pointer-events-none"
+  initial={{ height: 0 }}
+  whileInView={{ height: countToHeight(total) }}
+  style={{ bottom: 40 }}
+  transition={{ delay: index * 0.05 }}
+/>
+```
+
+The light bar reads as the total; the saturated bar covers the part of it
+that is the subset; the light sliver still showing above is the remainder.
+**Do not nest the subset inside the total** and do not make the total a thin
+cap above the subset — both produce a meaningless nub instead of a
+comparison.
+
+### Motion
+
+- Every bar grows from `height: 0` on `whileInView`.
+- Stagger by index, and give the **back bar the shorter delay** so the total
+  leads and the subset fills in behind it: back `index * 0.05`, front
+  `index * 0.1`.
+- Tooltip follows the cursor on a spring — `{type: 'spring', stiffness: 300,
+  damping: 30}` — animating `left`/`top`/`opacity`.
+- Hover is detected on the **container**, not per bar: take
+  `event.clientX - rect.left - 40`, divide by `(rect.width - 40) /
+  data.length`, floor it for the index. One listener, no gaps between bars.
+- Hover marker: a transparent ring behind the hovered column —
+  `border-2 border-zinc-300 dark:border-zinc-700 rounded-xl w-8`, height
+  `countToHeight(total) + 12`, fading `opacity 0→1`.
+
+### Axes
+
+- Ticks: `interval = Math.ceil(maxCount / 5)`, then `i * interval` for
+  `i` in `0..5`.
+- Labels are absolutely positioned in the rail by value, not spaced evenly:
+  `style={{ bottom: countToHeight(tick) }}`, `text-xs text-zinc-400`.
+- **Skip any label within 20px of the previous one** (`if (current - prev <
+  20) return null`) — without this, low-max datasets stack labels on top of
+  each other, which is the usual "the axis looks off" bug.
+- Numbers run through `toLocaleString` for thousands separators.
+- No gridlines. The register uses the value labels alone; ruled horizontal
+  lines behind the bars are not part of it.
+
+### Without a JS animation runtime
+
+`initial={{height: 0}}` means the bars **are** zero-height until script runs.
+That ships a blank chart to headless renderers, prerenders, and reader
+modes — the failure the ship gate's reduced-motion/visibility item exists to
+catch. Outside React/motion, invert it: render the bar at its true height in
+CSS, then let script animate *from* zero only when it can.
+
+```css
+.bar { height: var(--h); transition: height 600ms cubic-bezier(0.22,1,0.36,1); }
+.bar[data-armed="true"] { height: 0; }          /* only ever set by JS */
+@media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+```
+
+Two guards are required, not one. The no-JS fallback alone is not enough:
+if script *does* run, it arms the bars to zero, and then a viewport event
+that never fires (chart below the fold in a prerender, a full-page
+screenshot, a background tab, a bot) leaves them at zero permanently. Always
+pair the observer with a hard timeout.
+
+```js
+const chart = document.querySelector(".chart");
+const bars = [...chart.querySelectorAll(".bar")];
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+if (!("IntersectionObserver" in window)) return;   // guard 1: never arm
+
+let released = false;
+const release = () => {
+  if (released) return;
+  released = true;
+  bars.forEach(b => b.removeAttribute("data-armed"));
+};
+
+bars.forEach(b => b.dataset.armed = "true");
+
+const io = new IntersectionObserver((entries, obs) => {
+  for (const e of entries) if (e.isIntersecting) {
+    requestAnimationFrame(release);
+    obs.disconnect();
+  }
+}, { threshold: 0.25 });
+io.observe(chart);
+
+setTimeout(() => { release(); io.disconnect(); }, 1600);  // guard 2: backstop
+```
+
+Stagger by putting the per-bar delay in the markup
+(`style="--d: 165ms"`) and reading it in the transition
+(`transition-delay: var(--d, 0ms)`), so releasing is one attribute removal
+rather than a chain of timers that can half-complete.
+
 - 2020-dashboard minigraphs: tiny inline sparklines per stat, colored by the stat's
   hue, `background: transparent`.
 

@@ -112,6 +112,8 @@ column instead:
 | Drop shadow on a flat surface | `border border-primary` (10–15% alpha) |
 | Stock photo / screenshot | Faux UI built from divs, or AI album imagery per voice.md |
 | Chart library (recharts etc.) | Divs + `d3-scale` + motion `whileInView` per components.md §5 |
+| Two-series bar nested inside its total (or the total drawn as a cap above it) | Same-width layers: total in flow, subset `absolute z-20` on top — components.md §5 |
+| Evenly-spaced axis labels, or gridlines behind bars | Labels positioned by value (`bottom: scale(tick)`), 20px collision skip, no gridlines |
 | Section eyebrow / tracked caps heading | `font-mono text-sm text-muted` label, or nothing (caps tracking only at ≤9px inside faux OS chrome) |
 | Border radius > 16px | `rounded-xl` max on frames; `rounded-full` only on pills/dots |
 | Cream/beige body background | True off-white (`#fafaf9`-class, chroma ≈ 0) or the dark neutral |
@@ -126,9 +128,16 @@ because the surface "looks fine":
 2. Content column between 320–672px; body 16px with 1.5–1.7 leading.
 3. Every color utility has its `dark:` twin; toggle both themes and look.
 4. Every animation has a `prefers-reduced-motion` branch and nothing is
-   opacity-0 without JS.
-5. No row of the anti-pattern table's left column survives.
-6. Fixture/demo content is specific (names, numbers, provenance) — zero
+   opacity-0 (or height-0) without JS. **Verify by screenshotting the surface
+   with scripting unavailable or immediately on load** — scroll-triggered
+   reveals are the usual offender, and a blank section looks identical to a
+   section that simply hasn't animated yet.
+5. Any chart: bars carry real values at their true heights before script
+   runs; axis labels are positioned by value with a collision skip; a
+   two-series bar is a layer stack, not a nest. Read one datum off the
+   rendered chart and check it against the source number.
+6. No row of the anti-pattern table's left column survives.
+7. Fixture/demo content is specific (names, numbers, provenance) — zero
    lorem, zero "John Doe".
-7. Links use `underline-offset-4`; interactive elements have cursor and
+8. Links use `underline-offset-4`; interactive elements have cursor and
    focus states; hit areas ≥ 44px.
