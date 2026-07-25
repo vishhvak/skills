@@ -17,6 +17,8 @@ How the strongest agent-era repos write theirs (opencode ×15 files, openclaw ×
 
 6. **Personal layer stays personal.** `AGENTS.override.md` and `CLAUDE.local.md` are gitignored; that's where one developer's quirks live, not in review-visible diffs.
 7. **An AGENTS.md is not mandatory.** Tailwindcss ships none, deliberately. No tribal knowledge worth writing down yet → don't generate boilerplate; revisit when the same correction is made twice.
+8. **Prohibitions are a last resort.** Before writing a rule, ask: would a competent engineer reading this repo do the wrong thing without it? If not, the rule is noise the model must reconcile against every request — Anthropic deleted most of theirs from Claude Code's system prompt with no eval loss. Describe the local idiom instead of forbidding the alternative: their own before/after is `"default to writing no comments; never write multi-paragraph docstrings"` → `"write code that reads like the surrounding code: match its comment density, naming, and idiom."` Reserve absolutes for what actually burned you — those belong in Gotchas with the exact error text.
+9. **Don't document what the repo already says.** If a name, a script entry, or a type signature carries the fact, the AGENTS.md line restating it is dead weight loaded every session. Fix the name rather than describe it (SKILL.md Gate 3.6).
 
 ## Skeleton (root)
 
@@ -26,17 +28,24 @@ How the strongest agent-era repos write theirs (opencode ×15 files, openclaw ×
 <2 lines: what this is, what it is not.>
 
 ## Map
-<dir → one-line purpose. Point at nested AGENTS.md rather than duplicating them.>
+<ONLY dirs whose purpose the name doesn't already carry, plus pointers to nested
+AGENTS.md. A well-named tree needs no map. A long Map section is a renaming
+backlog, not a documentation gap — rename instead.>
 
 ## Commands
 | Change | Validate with |
 |---|---|
+<non-guessable invocations only — not what the manifest's scripts already list>
 
 ## Rules
 - <hard policy bullets: git identity, commit format, forbidden actions, artifact policy pointer to .agents/blueprint.json>
 
 ## Gotchas
 - <one bullet per burned lesson — exact flags, exact error text>
+- <deliberate absences: what a reader will search for that this repo does NOT
+  do, and why. Agents cannot grep for missing code — a well-organized repo keeps
+  offering plausible next places to look, so proving a negative burns a whole
+  budget. This bullet is cheapest where structure is best.>
 ```
 
 ## Growth protocol

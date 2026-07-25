@@ -36,6 +36,8 @@ Nuance from next.js — split INSIDE a tool dir when part is shared: `.claude/sk
 
 ## The policy decision (working docs)
 
+**First, prefer the executable form.** A spec that can be a failing test suite, a typed interface, or an HTML mockup should be one — that is tracked code, not a working doc, and it stays honest because it breaks when the implementation drifts. Agents read code at higher fidelity than prose about code: an HTML mockup beats a description or a screenshot of the same design. Markdown specs are the fallback for intent with no executable form — why, tradeoffs, rejected options. Classify only what's left under the policy below.
+
 Two legitimate regimes — the split the ecosystem hasn't standardized, so each repo must declare one in `.agents/blueprint.json`:
 
 - **private** — working docs never reach origin. For solo/agent-heavy repos where DESIGN.md-class docs are binding but internal. Add the block below. (llmfit regime.)

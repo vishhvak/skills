@@ -24,6 +24,7 @@ Exports map, minimum viable: `{".": {"types": "./dist/index.d.ts", "import": "./
 | ≥3 packages hand-copying tsconfig | shared base: root tsconfig extended by leaves (emulate) — a `typescript-config` package only at json-render scale (27 pkgs) |
 | ≥3 packages + build graph pain | turbo.json |
 | multiple publishable pkgs, different audiences | changesets; below that, manual version bump + changelog markers (portless) |
+| barrel file (`export * from ...`) | **default: don't.** `export *` erases the names it forwards, so an agent following `@scope/pkg` lands on `index.ts`, learns nothing, and re-greps inside the package — three hops to reach the search it could have started with. Deep-import internally; a barrel only for the public entry point |
 | cross-package structural rules | **delegate to konsistent** (`npx skills add vercel-labs/konsistent`) — sibling-file co-existence, barrel purity, import-direction layering, acronym-aware naming are its predicates; do not hand-roll checkers for these |
 | internal/fixture package | name it `internal-*` AND `"private": true` — visible in `ls`, not just in JSON |
 

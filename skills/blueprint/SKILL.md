@@ -56,6 +56,7 @@ Done when: the user has confirmed the table, not merely been shown it.
 3. `.gitignore` — the two blocks from `references/artifacts.md` (session-state block always; private-artifacts block when policy=private), each line commented with WHY.
 4. `.agents/work/` skeleton: `handoffs/ reports/ plans/ audits/` (+ `.gitkeep`s only if tracked policy).
 5. Language scaffold per the ONE matching expert reference.
+6. **Name for grep.** Agents navigate by string search — imports point only one way, `export *` barrels erase the names they forward, and methods have no import at all, so a distinctive name is the only reverse index. Measured on 7,922 exports: a 1-word name has a 61% chance of grepping to a single definition, 2 words 88%, **3 words 96%**. Apply at creation, when renaming is free: every directory names a concept, never a role (`session-broker/`, not `utils/ lib/ helpers/ common/` — paths are search terms, so a well-named dir is a hit before a file is opened); exported symbols get 2–3 words with one domain word (`createStripeClient`, not `create`); test files mirror the source name (`stripe.test.ts` ← `stripe.ts`); one spelling per concept repo-wide; legacy paths marked `@deprecated` or deleted, or agents will find and use them.
 
 **Gate 4 — Verify.** Script prints `CLEAN`, and `git status` shows no working-doc paths staged under private policy. Both, or the gate is not passed.
 
