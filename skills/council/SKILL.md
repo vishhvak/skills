@@ -1,6 +1,6 @@
 ---
 name: council
-description: Convene other frontier models for second opinions or multi-round debate on a decision, design, diagnosis, or review. Seats: GPT-5.6 Sol (codex CLI), Claude Opus 5 (cursor-agent CLI), Claude Fable 5 (claude CLI), Grok 4.6 (grok CLI), all at high reasoning effort with full tool access. Use when asked to "consult the council", "roundtable this", "ask the other models", "get a second opinion", "debate this across models", or before committing to a contested technical choice.
+description: 'Convene other frontier models for second opinions or multi-round debate on a decision, design, diagnosis, or review. Seats: GPT-5.6 Sol (codex CLI), Claude Opus 5 (cursor-agent CLI), Claude Fable 5 (claude CLI), Grok 4.6 (grok CLI), all at high reasoning effort with full tool access. Use when asked to "consult the council", "roundtable this", "ask the other models", "get a second opinion", "debate this across models", or before committing to a contested technical choice.'
 ---
 
 # council
