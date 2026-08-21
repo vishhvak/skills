@@ -21,5 +21,6 @@ npx skills add vishhvak/skills/skill-engineering
 | [skill-engineering](skills/skill-engineering) | Write, upgrade, or audit agent skills so they beat the median — harness machinery (sub-agents, hooks, scripts, routing, memory) plus the prose discipline inside SKILL.md. |
 | [medulla](skills/medulla) | Density editing, named for the marrow — the innermost core: revise prose until a max-retention compression of it must drop ideas. Freezes an idea inventory, uses a blind summarizer as an adversary to convict padded passages, guards against inventing facts to look dense. |
 | [imagegen](skills/imagegen) | One image CLI for any harness: generate or edit images with gpt-image-2 on your ChatGPT subscription (chatgpt-oauth device login, no per-image cost), falling back to `OPENAI_API_KEY` only when the subscription is unavailable. Machine-readable stdout (`WROTE`/`NEEDS_LOGIN`/`BACKEND`) so agents can follow it blind. |
+| [axon-illustrations](skills/axon-illustrations) | Hand-drawn 16:9 editorial illustrations for articles, starring Axon, a deadpan neuron-creature (black body, dendrite antlers, synapse tail that plugs into the diagram). Digest the piece, shot-list the turning points, generate via imagegen, QA against an 8-point checklist, deliver numbered PNGs. |
 
 [![skills.sh](https://skills.sh/b/vishhvak/skills)](https://skills.sh/vishhvak/skills)
