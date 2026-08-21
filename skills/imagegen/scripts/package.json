@@ -1,0 +1,8 @@
+{
+  "name": "imagegen-skill",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "chatgpt-oauth": "^0.3.1"
+  }
+}
