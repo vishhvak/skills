@@ -3,7 +3,7 @@ name: story-so-far
 description: 'Catch a returning reader up on in-flight work as a paginated briefing: a dense foreword first, then chapters on demand. Use when someone returns cold to a project or session and asks where things stand, what they missed, to be caught up, or to be walked through the work; also when an answer would otherwise be an info dump.'
 metadata:
   trigger: Returning to a project or session without context, "where were we", "catch me up", "what's the state of this"
-  combines: minto (structure) · medulla (density) · unslop + stop-slop + better-writing (voice)
+  combines: minto (structure) · medulla (density) · unslop + better-writing (voice)
 ---
 
 # Story so far
@@ -95,8 +95,8 @@ behind, never a target.
 
 Run these before emitting, rather than restating their rules here:
 
-- **`stop-slop`** for the quick checks: adverbs, passive voice, throat-clearing, "not X but Y"
-- **`unslop`** for the self-audit: "what makes this obviously AI generated?"
+- **`unslop`** for the AI-tell pass: adverbs, passive voice, throat-clearing, "not X but Y",
+  then the self-audit "what makes this obviously AI generated?"
 - **`better-writing`** for plain words, one voice, tone matched to stakes
 
 What this skill adds on top: **the reader is an expert who lost context, not a beginner.**
