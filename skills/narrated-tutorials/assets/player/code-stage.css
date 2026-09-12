@@ -1,0 +1,433 @@
+/* The stage owns its chrome so it can be mounted into the existing #codepane
+   without relying on utility classes from the source site. */
+.effect-code-mounted {
+  --effect-code-size: var(--code-text-size, 17px);
+  --effect-code-leading: var(--code-line-height, 1.55);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.effect-code-stage {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  color: #f1efe8;
+  isolation: isolate;
+}
+
+.effect-code-stage.is-empty {
+  min-height: 1px;
+}
+
+.effect-code-block {
+  box-sizing: border-box;
+  position: relative;
+  width: min(100%, 72ch);
+  min-width: min(100%, 72ch);
+  max-width: 72ch;
+  min-height: calc(var(--effect-code-size) * var(--effect-code-leading));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  white-space: pre;
+  tab-size: 2;
+  font-family:
+    Commit Mono,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: var(--effect-code-size);
+  line-height: var(--effect-code-leading);
+  letter-spacing: -0.01em;
+  text-rendering: geometricPrecision;
+  transform: translateZ(0);
+}
+
+.effect-code-lines,
+.effect-code-decoration-layer,
+.effect-code-particle-layer,
+.effect-code-cursor-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.effect-code-lines {
+  z-index: 5;
+  contain: style layout;
+}
+
+.effect-code-line {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(var(--effect-code-size) * var(--effect-code-leading));
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  contain: style layout;
+  transition:
+    transform 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 300ms ease,
+    filter 450ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.effect-code-line.is-entering {
+  filter: blur(4px);
+}
+
+.effect-code-line.is-leaving {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.effect-code-line-content {
+  box-sizing: border-box;
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  height: 100%;
+  white-space: pre;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.effect-code-line-content::before {
+  content: "\00a0";
+  display: none;
+}
+
+.effect-code-line-content:empty::before {
+  display: inline;
+}
+
+.effect-code-part {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: none;
+  overflow: hidden;
+  white-space: pre;
+  vertical-align: baseline;
+  opacity: 1;
+  filter: blur(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition:
+    opacity 300ms ease,
+    filter 300ms ease,
+    max-width 450ms ease;
+}
+
+.effect-code-part.is-hidden {
+  max-width: 0;
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.effect-code-part.is-empty {
+  min-width: 0;
+}
+
+.effect-code-part.is-output {
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+  color: #a1a1aa;
+  background: rgba(39, 39, 42, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(63, 63, 70, 0.5);
+}
+
+.effect-code-part-text {
+  display: inline;
+  white-space: pre;
+  font: inherit;
+  line-height: inherit;
+}
+
+.effect-code-token {
+  display: inline;
+  white-space: pre;
+  font: inherit;
+  line-height: inherit;
+  transition:
+    opacity 300ms ease,
+    text-shadow 300ms ease,
+    color 300ms ease;
+}
+
+.effect-code-part.is-crossfading .effect-code-token {
+  animation: effect-code-crossfade 300ms ease both;
+}
+
+@keyframes effect-code-crossfade {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: inherit;
+    filter: blur(0);
+  }
+}
+
+.effect-code-output-arrow {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  margin-right: 0.5rem;
+  color: #71717a;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.9em;
+  line-height: inherit;
+}
+
+.effect-code-decoration-layer {
+  z-index: 2;
+  overflow: visible;
+}
+
+.effect-code-decoration {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 4px;
+  pointer-events: none;
+  transform: translateZ(0);
+  transition:
+    left 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    top 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    width 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 450ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 300ms ease;
+}
+
+.effect-code-mark {
+  z-index: 1;
+  background: rgba(251, 191, 36, 0.3);
+  border: 1px solid rgba(251, 191, 36, 0.8);
+  background: color-mix(
+    in srgb,
+    var(--effect-decoration-color, #fbbf24) 30%,
+    transparent
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--effect-decoration-color, #fbbf24) 80%, transparent);
+  opacity: 0.8;
+}
+
+.effect-code-glow {
+  z-index: 0;
+  background: var(--effect-decoration-color, #22c55e);
+  box-shadow: 0 0 32px var(--effect-decoration-color, #22c55e);
+  filter: blur(16px);
+  opacity: 0.35;
+}
+
+.effect-code-status {
+  box-sizing: border-box;
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  vertical-align: -0.15em;
+  border-radius: 999px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.effect-code-status.status-running {
+  border: 1px solid rgba(96, 165, 250, 0.65);
+  color: #93c5fd;
+}
+
+.effect-code-status.status-running span {
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: effect-code-spin 700ms linear infinite;
+}
+
+.effect-code-status.status-success {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.16);
+}
+
+.effect-code-status.status-error,
+.effect-code-status.status-die {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.effect-code-status.status-interrupted {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+@keyframes effect-code-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.effect-code-line.background-success {
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.effect-code-line.background-error {
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.effect-code-line.background-warning {
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.effect-code-line.background-info {
+  padding-left: 8px;
+  margin-left: -8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.effect-code-particle-layer,
+.effect-code-cursor-layer {
+  overflow: visible;
+}
+
+.effect-code-particle-layer {
+  z-index: 30;
+}
+
+.effect-code-particle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max-content;
+  height: max-content;
+  pointer-events: none;
+  font-size: 20px;
+  line-height: 1;
+  transform: translate3d(0, 0, 0) translate(-50%, -50%) scale(0);
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.effect-code-cursor-layer {
+  z-index: 40;
+}
+
+.effect-code-cursor {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+  transform: translate3d(0, 0, 0);
+  transform-origin: center;
+  opacity: 0;
+  filter: blur(2px);
+  transition: none;
+  backface-visibility: hidden;
+}
+
+.effect-code-cursor-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.effect-code-measure {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  width: max-content;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  white-space: pre;
+  pointer-events: none;
+  font: inherit;
+  line-height: inherit;
+}
+
+.effect-code-stage.is-seeking .effect-code-line,
+.effect-code-stage.is-seeking .effect-code-part,
+.effect-code-stage.is-seeking .effect-code-decoration,
+.effect-code-stage.is-seeking .effect-code-cursor {
+  transition: none !important;
+}
+
+@media (max-width: 880px) {
+  .effect-code-stage {
+    padding: 24px;
+  }
+  .effect-code-block {
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .effect-code-line,
+  .effect-code-part,
+  .effect-code-token,
+  .effect-code-decoration,
+  .effect-code-cursor {
+    transition-duration: 1ms !important;
+  }
+  .effect-code-particle,
+  .effect-code-status.status-running span {
+    animation: none !important;
+  }
+}

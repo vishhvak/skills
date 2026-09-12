@@ -1,0 +1,56 @@
+<!doctype html><meta charset="utf-8"><title>Registry motion verification</title>
+<style>body{background:#080808;color:#ddd;font:15px monospace}#host{width:min(1024px,100%);aspect-ratio:1024/510}</style>
+<h1>Registry motion checks</h1><pre id="results">Running…</pre><div id="host"></div>
+<script type="module">
+import {mount} from '../scenes/registry.js';
+const host=document.querySelector('#host'),result=document.querySelector('#results'),checks=[];
+const assert=(condition,label)=>{checks.push((condition?'PASS ':'FAIL ')+label);if(!condition)throw Error(label)};
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+let scene,time=0,heard=[];
+const original=window.matchMedia;
+try{
+ const context={pause:()=>scene.stop(),getTime:()=>time,sound:event=>heard.push(event)};
+ scene=mount(host,context);
+ assert(host.querySelector('[data-count]').getAttribute('aria-label')==='0 / 0','Initial empty count is zero');
+ scene.render(4.1);const visible=[...host.querySelectorAll('[data-switch]')].filter(node=>node.getAttribute('tabindex')==='0').length;
+ assert(visible>0&&visible<6,'Entrance reveals rows in stages');
+ const firstY=host.querySelector('[data-model="0"]').getAttribute('transform');scene.render(4.2);
+ assert(firstY!==host.querySelector('[data-model="0"]').getAttribute('transform'),'Rows continue settling between adjacent frames');
+ scene.render(4.8);assert([...host.querySelectorAll('[data-switch]')].every(node=>node.getAttribute('tabindex')==='0'),'All six controls become interactive after reveal');
+ scene.render(5.7);const point=host.querySelector('[data-pulse="policy"]');
+ assert(Number(point.getAttribute('cy'))<100,'Policy pulse follows complete path toward the table');
+ scene.render(15.6);const wave=host.innerHTML;scene.render(2);scene.render(15.6);assert(host.innerHTML===wave,'Wave phase and all DOM state seek deterministically');
+ scene.render(16.2);assert(host.querySelector('[data-ripple-group]').getAttribute('filter')!=='none','Wave continues after table empties');
+ scene.render(16.5);assert(host.querySelector('[data-ripple-group]').getAttribute('filter')==='none','Distortion settles fully');
+ assert(heard.length===0,'Passive renders do not emit sound');
+ scene.reset();time=0;heard=[];
+ host.querySelector('[data-source="models"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+ await wait(700);assert(host.querySelector('[data-count]').getAttribute('aria-label')==='0 / 0','Manual refresh shows loading instead of instant success');
+ await wait(2600);assert(host.querySelector('[data-count]').getAttribute('aria-label')==='6 / 6','Manual refresh completes through the delivery/reveal sequence');
+ assert(heard.includes('source')&&heard.includes('toggle'),`Manual effects follow source and arrival events (${heard.join(',')})`);
+ host.querySelector('[data-switch="0"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));await wait(80);
+ const before=Number(host.querySelector('[data-model="0"]').getAttribute('opacity'));
+ host.querySelector('[data-switch="0"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));await wait(30);
+ const after=Number(host.querySelector('[data-model="0"]').getAttribute('opacity'));
+ assert(Math.abs(after-before)<.15,'Interrupted toggle resumes from its displayed value');
+ scene.stop();const frozen=host.innerHTML;await wait(100);assert(host.innerHTML===frozen,'Pause cancels the manual animation');
+ scene.render(2);assert(host.innerHTML===frozen,'Manual override survives backward seek');
+ scene.reset();assert(host.querySelector('[data-count]').getAttribute('aria-label')==='0 / 0','Replay clears manual state');
+ scene.render(15.9);const exitOpacity=Number(host.querySelector('[data-content]').getAttribute('opacity'));
+ host.querySelector('[data-source="models"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));await wait(20);
+ const interruptedOpacity=Number(host.querySelector('[data-content]').getAttribute('opacity'));
+ assert(interruptedOpacity>0&&interruptedOpacity<=exitOpacity,'Refreshing mid-exit continues fading the visible pose');
+ scene.reset();scene.render(8.5);
+ host.querySelector('[data-source="models"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));await wait(3300);
+ const shown=[...host.querySelectorAll('[data-digit]')].map(node=>{
+  const y=Number(node.getAttribute('transform').match(/ ([\d.]+)\)/)[1]);
+  return node.querySelector(y>=196.5?'[data-digit-next]':'[data-digit-current]').textContent;
+ }).join('');
+ assert(shown==='60:00','Refresh during accelerated countdown resets every reel to 60:00');
+ scene.destroy();window.matchMedia=()=>({matches:true});scene=mount(host,{});scene.render(4.1);
+ assert([...host.querySelectorAll('[data-model]')].every(node=>node.getAttribute('filter')==='none'),'Reduced motion removes row blur');
+ scene.render(15.6);assert(host.querySelector('[data-ripple-group]').getAttribute('filter')==='none','Reduced motion removes distortion');
+ scene.destroy();result.textContent=checks.join('\n');
+}catch(error){result.textContent=checks.join('\n')+'\nERROR '+error.stack;scene?.destroy();}
+finally{window.matchMedia=original;}
+</script>

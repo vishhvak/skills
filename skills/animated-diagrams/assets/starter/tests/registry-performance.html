@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>Registry playback performance</title><style>body{background:#080808;color:#ddd;font:14px monospace}#host{width:min(1024px,100%);aspect-ratio:1024/510}</style><h1>Registry playback performance</h1><pre id="results">Measuring…</pre><div id="host"></div><script type="module">
+import {mount} from '../scenes/registry.js';
+const host=document.querySelector('#host'),scene=mount(host,{}),result=document.querySelector('#results');
+const intervals=[],costs=[];let start,last;
+function tick(now){
+ if(start===undefined){start=now;last=now;}
+ const age=(now-start)/1000;const before=performance.now();
+ scene.render(age<2?3.2+age:14.7+age-2,{playing:true});costs.push(performance.now()-before);
+ if(now>last)intervals.push(now-last);last=now;
+ if(age<4)requestAnimationFrame(tick);else{
+  const sorted=intervals.toSorted((a,b)=>a-b),cpu=costs.toSorted((a,b)=>a-b);
+  result.textContent=JSON.stringify({frames:intervals.length,elapsedSeconds:age,averageFps:intervals.length/age,frameIntervalP95ms:sorted[Math.floor(sorted.length*.95)],renderCostP95ms:cpu[Math.floor(cpu.length*.95)],longFramesOver50ms:intervals.filter(n=>n>50).length},null,2);
+  scene.destroy();
+ }
+}
+requestAnimationFrame(tick);
+</script>

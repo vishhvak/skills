@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>Diagram runtime verification</title><style>body{background:#080808;color:#ddd;font:15px monospace}#host{width:1024px;height:605px}</style><h1>Runtime checks</h1><pre id="results">Running…</pre><div id="host"></div><script type="module">
+import * as models from '../scenes/models.js';
+const result=document.querySelector('#results'), host=document.querySelector('#host'),checks=[];
+const assert=(condition,label)=>{checks.push((condition?'PASS ':'FAIL ')+label);if(!condition)throw Error(label)};
+const original=window.matchMedia;
+try {
+ window.matchMedia=()=>({matches:true});
+ let scene=models.mount(host,{});scene.render(26.6);
+ assert(!host.querySelector('.row.updating'),'Reduced motion removes animated row treatment');
+ assert([...host.querySelectorAll('.row-visuals')].every(n=>n.getAttribute('filter')==='none'),'Reduced motion removes distortion');
+ assert([...host.querySelectorAll('.glitch-line-red,.glitch-line-cyan')].every(n=>n.getAttribute('visibility')==='hidden'),'Reduced motion suppresses RGB traces');
+ assert([...host.querySelectorAll('.row')].every(n=>n.getAttribute('transform').startsWith('translate(0 ')),'Reduced motion suppresses horizontal jitter');
+ assert(host.querySelector('#refresh-icon').getAttribute('transform')==='','Reduced motion keeps status glyph stationary');
+ assert([...host.querySelectorAll('.row')].find(n=>n.getAttribute('aria-label').startsWith('DeepSeek V4 Flash')).textContent.includes('.14 / .28'),'Reduced motion retains model values');
+ scene.destroy();window.matchMedia=original;
+ scene=models.mount(host,{});scene.render(26.6);
+ const hidden=[...host.querySelectorAll('.row')].filter(n=>n.getAttribute('aria-hidden')==='true');
+ assert(hidden.every(n=>n.getAttribute('tabindex')==='-1'),'Covered rows are removed from keyboard focus');
+ const victim=hidden.find(n=>n.getAttribute('visibility')==='visible');
+ assert(Boolean(victim),'Fixture exposes a covered row');
+ if(victim){const before=victim.getAttribute('aria-checked');victim.dispatchEvent(new MouseEvent('click',{bubbles:true}));assert(victim.getAttribute('aria-checked')===before,'Covered row cannot be toggled by activation');}
+ assert(getComputedStyle(host.querySelector('.provider-row')).pointerEvents==='all','Sticky heading intercepts pointer hits');
+ scene.render(10);const first=host.innerHTML;scene.render(2);scene.render(10);assert(first===host.innerHTML,'Shimmer and sticky headings seek deterministically');
+ scene.destroy();result.textContent=checks.join('\n');
+} catch(error) { result.textContent=checks.join('\n')+'\nERROR '+error.message; }
+finally { window.matchMedia=original; }
+</script>

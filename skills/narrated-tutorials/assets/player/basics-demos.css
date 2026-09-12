@@ -1,0 +1,624 @@
+/*
+ * Effect Basics' small state diagrams.  The real lessons use Pixi for this
+ * stage, but the geometry is intentionally ordinary DOM: 64px effect boxes,
+ * a 40px top inset, 10px label gap, and the same state palette as the public
+ * component renderer.
+ */
+.basic-demo-root {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg, #f1efe8);
+  font-family: var(--mono, "Commit Mono", ui-monospace, monospace);
+  line-height: 1;
+  user-select: none;
+}
+
+.basic-demo-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.basic-demo-stage {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  min-height: 0;
+  overflow: visible;
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.basic-demo-stage.is-stage-hidden {
+  height: 0;
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+.basic-demo-node-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.basic-demo-node-layer.is-node-layer-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+.basic-demo-node-row {
+  position: absolute;
+  top: 78px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  min-height: 92px;
+  overflow: visible;
+}
+
+.basic-demo-node-wrap {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  height: 92px;
+  overflow: visible;
+  animation: basic-demo-node-in 260ms ease both;
+}
+
+.basic-demo-node-wrap.is-node-hidden {
+  width: 0 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.basic-demo-node-slot {
+  width: 100%;
+  height: 64px;
+  display: flex;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.basic-demo-node-box {
+  position: relative;
+  width: var(--basic-node-width, 64px);
+  height: 64px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0;
+  color: rgba(255, 255, 255, 0.9);
+  overflow: visible;
+  contain: layout style paint;
+  transition:
+    width 260ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    height 260ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.basic-demo-node-box.is-running {
+  height: 26px;
+  border-color: rgba(100, 200, 255, 0.72);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.34);
+}
+
+.basic-demo-node-box.is-running::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 26%,
+    rgba(255, 255, 255, 0.44) 48%,
+    transparent 70%
+  );
+  background-size: 230% 100%;
+  mix-blend-mode: screen;
+  opacity: 0.62;
+  animation: basic-demo-sweep 1.8s linear infinite;
+  pointer-events: none;
+}
+
+.basic-demo-node-box.is-completed {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(21, 128, 61, 0.18);
+}
+
+.basic-demo-node-box.is-failed {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 11px rgba(239, 68, 68, 0.25);
+  animation: basic-demo-failure-jitter 0.7s ease both;
+}
+
+.basic-demo-node-box.is-interrupted {
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+}
+
+.basic-demo-icon {
+  width: 29px;
+  height: 29px;
+  display: block;
+  color: rgba(255, 255, 255, 0.9);
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.16));
+  animation: basic-demo-icon-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.basic-demo-node-result {
+  display: block;
+  max-width: calc(100% - 14px);
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: clip;
+  animation: basic-demo-result-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.basic-demo-node-label {
+  position: absolute;
+  top: 74px;
+  left: 50%;
+  width: max-content;
+  max-width: 180px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transition:
+    color 260ms ease,
+    opacity 260ms ease;
+}
+
+.state-idle .basic-demo-node-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+.state-running .basic-demo-node-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+.state-failed .basic-demo-node-label,
+.state-death .basic-demo-node-label {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.basic-demo-bubble {
+  position: absolute;
+  z-index: 4;
+  top: -38px;
+  left: 50%;
+  min-width: max-content;
+  max-width: 260px;
+  min-height: 30px;
+  padding: 7px 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 0;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(59, 130, 246, 0.3);
+  font-size: 16px;
+  line-height: 16px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: basic-demo-bubble-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.basic-demo-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-top: 6px solid currentColor;
+  border-right: 6px solid transparent;
+  border-left: 6px solid transparent;
+  color: inherit;
+  transform: translateX(-50%);
+}
+
+.basic-demo-error-bubble {
+  background: #ef4444;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.basic-demo-log-bubble {
+  background: #3b82f6;
+}
+
+.basic-demo-arrow {
+  width: 48px;
+  height: 64px;
+  display: inline-flex;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+/* WhyCompose's second half places the two child effects in a bordered row. */
+.basic-demo-boundary {
+  position: absolute;
+  top: 53px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  min-width: 180px;
+  min-height: 112px;
+  padding: 24px 16px 16px;
+  border: 2px dashed rgba(71, 85, 105, 0.9);
+  transform: translateX(-50%);
+  transition:
+    border-color 220ms ease,
+    opacity 220ms ease;
+}
+
+.basic-demo-boundary .basic-demo-node-row {
+  position: relative;
+  inset: auto;
+  min-height: 92px;
+}
+
+/* ErrorShortCircuit's simulated input is still a narration snapshot. */
+.basic-demo-age-input {
+  position: absolute;
+  z-index: 6;
+  top: 66px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  animation: basic-demo-input-in 280ms ease both;
+}
+
+.basic-demo-age-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 42px;
+}
+
+.basic-demo-age-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.basic-demo-age-field {
+  position: relative;
+  width: 120px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.basic-demo-age-input.has-error .basic-demo-age-field {
+  border-color: rgba(239, 68, 68, 0.7);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.basic-demo-age-value {
+  white-space: pre;
+}
+
+.basic-demo-caret {
+  width: 2px;
+  height: 14px;
+  margin-left: 1px;
+  background: rgba(255, 255, 255, 0.6);
+  animation: basic-demo-caret 1s steps(1, end) infinite;
+}
+
+.basic-demo-enter {
+  width: 70px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  line-height: 18px;
+  transition:
+    transform 120ms ease,
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.basic-demo-enter:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+.basic-demo-enter.is-pressed {
+  transform: translateY(2px) scale(0.96);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.basic-demo-input-error {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 5px);
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.basic-demo-age-input.is-shaken {
+  animation: basic-demo-input-shake 300ms ease both;
+}
+
+@keyframes basic-demo-node-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes basic-demo-icon-in {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@keyframes basic-demo-result-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@keyframes basic-demo-bubble-in {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateX(-50%) translateY(8px) scale(0.72);
+  }
+  to {
+    opacity: 0.96;
+    filter: blur(0);
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes basic-demo-input-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes basic-demo-input-shake {
+  0%,
+  100% {
+    transform: translateX(-50%);
+  }
+  25% {
+    transform: translateX(calc(-50% - 4px));
+  }
+  50% {
+    transform: translateX(calc(-50% + 4px));
+  }
+  75% {
+    transform: translateX(calc(-50% - 4px));
+  }
+}
+
+@keyframes basic-demo-failure-jitter {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-1px, 1px) rotate(-0.6deg);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(0.6deg);
+  }
+  60% {
+    transform: translate(-1px, 0) rotate(-0.4deg);
+  }
+  80% {
+    transform: translate(1px, 1px) rotate(0.4deg);
+  }
+}
+
+@keyframes basic-demo-sweep {
+  from {
+    background-position: 160% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+@keyframes basic-demo-caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .basic-demo-node-row {
+    left: 6px;
+    right: 6px;
+    gap: 14px;
+  }
+  .basic-demo-bubble {
+    font-size: 13px;
+  }
+  .basic-demo-arrow {
+    width: 32px;
+    flex-basis: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .basic-demo-node-row {
+    gap: 8px;
+  }
+  .basic-demo-node-label {
+    font-size: 11px;
+  }
+  .basic-demo-age-row {
+    gap: 10px;
+  }
+  .basic-demo-age-field {
+    width: 100px;
+  }
+  .basic-demo-arrow {
+    width: 20px;
+    flex-basis: 20px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .basic-demo-root *,
+  .basic-demo-root *::before,
+  .basic-demo-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .basic-demo-node-box,
+  .basic-demo-boundary,
+  .basic-demo-age-field,
+  .basic-demo-enter {
+    border-color: CanvasText;
+  }
+}
+
+.basic-demo-stage {
+  transition:
+    height 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.26s ease,
+    transform 0.26s ease;
+}
+.basic-demo-age-input {
+  top: 18px;
+  animation: none;
+}
+.basic-demo-age-row {
+  gap: 27px;
+  height: 58px;
+}
+.basic-demo-age-label {
+  font-size: 15.75px;
+  line-height: 22.5px;
+  margin-right: -18px;
+}
+.basic-demo-age-field {
+  min-height: 38px;
+  padding: 6.75px 13.5px;
+  font-size: 15.75px;
+  line-height: 22.5px;
+}
+.basic-demo-enter {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 6px;
+  color: #999;
+  font-size: 15px;
+  line-height: 1;
+  background: #000;
+  border: 1.5px solid #333;
+  box-shadow: inset 0 -6px #1a1a1a;
+  cursor: default;
+}
+.basic-demo-enter.is-pressed {
+  transform: translateY(6px);
+  height: 52px;
+  margin-bottom: 6px;
+  box-shadow: none;
+  background: #141414;
+  border-color: #666;
+}
+.basic-demo-enter:hover {
+  color: #999;
+  background: #000;
+}

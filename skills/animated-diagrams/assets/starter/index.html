@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" data-example="blog">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Diagram studies</title><link rel="stylesheet" href="gallery.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="masthead"><a href="#blog" class="brand">◌ &nbsp; DIAGRAM STUDIES</a><span>Five interactive recreations</span></header>
+  <div class="workspace">
+    <aside><p class="eyebrow">The references, rebuilt</p><nav aria-label="Examples" id="examples"></nav><p class="sidebar-note">Rendered with real SVG and DOM. Replay a sequence, scrub through it, or try the controls yourself.</p></aside>
+    <main class="study-main">
+      <div class="study-heading"><div><h1 id="title">Loading study</h1><p id="description"></p></div><div class="view-actions"><button id="focus" aria-pressed="false">Focus view</button><button id="compare" aria-pressed="false">Compare reference</button></div></div>
+      <div class="canvases" id="canvases"><section class="canvas" aria-label="Interactive recreation"><div class="canvas-label">RECREATION <span id="mode">REPLAY</span></div><div id="stage"></div></section><section class="canvas reference" aria-label="Original video" hidden><div class="canvas-label">ORIGINAL VIDEO <span id="reference-frame" aria-label="Reference frame time">SUPPLIED REFERENCE</span></div><video id="reference" muted playsinline preload="metadata"></video><p id="reference-error" hidden>The reference clip is not in this checkout. See sources.json for the required filename.</p></section></div>
+      <div class="transport"><button id="play" aria-label="Play">▶ <span>Play</span></button><button id="replay" aria-label="Replay from start">↶</button><label class="timeline-label"><span class="sr-only">Replay position</span><input id="timeline" type="range" min="0" max="60" step="0.01" value="0"></label><div class="time-control"><button id="time" aria-label="Jump to time" aria-expanded="false" aria-controls="jump">0:00 / 0:00</button><form id="jump" hidden novalidate><label>Seconds<input id="seconds" type="number" min="0" step="0.01" value="0" aria-label="Time in seconds"></label><button type="submit">Go</button></form></div><button id="speed" aria-label="Playback speed">1×</button><div class="sound-controls"><button id="sound-toggle" aria-label="Sound effects" aria-pressed="true">SFX on</button><label><span class="sr-only">Sound effect volume</span><input id="sound-volume" type="range" min="0" max="100" step="1" value="70"></label></div></div>
+      <div class="details"><p id="hint" role="status">Choose an example.</p><div id="capabilities"></div></div>
+    </main>
+  </div>
+  <script type="module" src="gallery.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html><meta charset="utf-8"><title>Scene sound verification</title>
+<style>body{background:#080808;color:#ddd;font:15px monospace}#host{width:1089px;height:579px}</style>
+<h1>Scene sound checks</h1><pre id="results">Running…</pre><div id="host"></div>
+<script type="module">
+import * as nodes from '../scenes/nodes.js';
+import * as models from '../scenes/models.js';
+import * as registry from '../scenes/registry.js';
+import * as blog from '../scenes/blog.js';
+import * as editor from '../scenes/editor.js';
+const host=document.querySelector('#host'),result=document.querySelector('#results'),checks=[];
+const assert=(condition,label)=>{checks.push((condition?'PASS ':'FAIL ')+label);if(!condition)throw Error(label)};
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+let scene;
+try {
+ let heard=[],time=0;
+ const context={sound:event=>heard.push({event,time}),pause:()=>scene.stop?.(),getTime:()=>time};
+ scene=nodes.mount(host,context);
+ for(time=0;time<4.4;time+=.01)scene.render(time,{playing:true});
+ assert(heard.map(item=>item.event).join(',')==='request,route,arrival','Routing emits three distinct visual transition sounds');
+ assert(heard[1].time>2.94&&heard[1].time<2.98&&heard[2].time>3.90&&heard[2].time<3.94,'Route and arrival events follow the scene progress');
+ heard=[];scene.render(1);scene.render(4);scene.render(4.01,{playing:true});
+ assert(heard.length===0,'Seeking into an active effect does not replay its sound');
+ time=12;scene.render(time);heard=[];
+ host.querySelector('.request-arrow').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+ await wait(3100);
+ assert(heard.map(item=>item.event).join(',')==='request,route,arrival','Manual request emits its own sequence at an arbitrary replay position');
+ assert(heard.every(item=>item.time===12),'Manual sound does not depend on the recording clock');
+ heard=[];host.querySelector('.request-arrow').dispatchEvent(new MouseEvent('click',{bubbles:true}));scene.stop();await wait(350);
+ assert(heard.length===0,'Stopping a manual request cancels future effect events');
+ scene.destroy();
+ scene=models.mount(host,context);time=0;
+ host.querySelector('[aria-label="Refresh model prices"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+ await wait(250);scene.stop();scene.render(26.6);const sought=host.innerHTML;
+ scene.render(27.1,{playing:true});assert(host.innerHTML!==sought,'Model rendering advances after a refresh is interrupted');
+ scene.render(26.6);assert(host.innerHTML===sought,'Interrupted refresh does not block deterministic seeking');scene.destroy();
+ for(const module of [models,registry]) {
+   heard=[];scene=module.mount(host,context);
+   for(time=0;time<module.meta.duration;time+=.02)scene.render(time,{playing:true});
+   assert(heard.length>0,`${module.meta.id} emits semantic events during continuous playback`);
+   heard=[];scene.reset();scene.render(module.meta.duration/2);scene.render(1);
+   assert(heard.length===0,`${module.meta.id} passive renders and backward seeks are silent`);
+   scene.destroy();
+ }
+ for(const module of [blog,editor]) {
+   heard=[];scene=module.mount(host,context);
+   for(time=0;time<module.meta.duration;time+=.05)scene.render(time,{playing:true});
+   assert(heard.length===0,`${module.meta.id} silent reference emits no events`);scene.destroy();
+ }
+ result.textContent=checks.join('\n');
+} catch(error){scene?.destroy();result.textContent=checks.join('\n')+'\nERROR '+error.stack;}
+</script>

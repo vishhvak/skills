@@ -1,0 +1,29 @@
+{
+  "blog": {
+    "kind": "silent"
+  },
+  "nodes": {
+    "kind": "reference-effects",
+    "events": {
+      "request": "crispTick",
+      "route": "crispTick",
+      "arrival": "settleTone"
+    }
+  },
+  "models": {
+    "kind": "reference-effects",
+    "events": {
+      "update": "dataBurst"
+    }
+  },
+  "registry": {
+    "kind": "reference-effects",
+    "events": {
+      "source": "softPulse",
+      "toggle": "crispTick"
+    }
+  },
+  "editor": {
+    "kind": "silent"
+  }
+}

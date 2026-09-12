@@ -1,0 +1,6 @@
+# Supplied source clips for local visual comparison.
+references/*.mp4
+
+# Keep local verification evidence out of the distributed example.
+diagram-manifest.json
+verification/

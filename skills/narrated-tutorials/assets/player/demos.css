@@ -1,0 +1,687 @@
+/* Reference-driven companions for sections whose right-hand stage is a
+   bespoke React component on effect.institute.  The prefix keeps this file
+   independent from the lesson shell and from the code slideshow. */
+.effect-demo-root {
+  width: 100%;
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  color: var(--fg, #f1efe8);
+  font-family: var(--mono, "Commit Mono", ui-monospace, monospace);
+  line-height: 1;
+  user-select: none;
+}
+
+.effect-demo-root button {
+  color: inherit;
+  font: inherit;
+}
+
+.ei-demo-keyboard {
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.ei-demo-keyboard-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+}
+
+.ei-demo-badge-host {
+  width: 240px;
+  height: 240px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.ei-demo-badge-host.is-hidden {
+  display: none;
+}
+
+.ei-demo-badge-fallback {
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.ei-demo-space-group {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ei-demo-keyboard-main.is-space-visible .ei-demo-space-group {
+  display: flex;
+}
+
+.ei-demo-completion {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: none;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.ei-demo-completion.is-visible {
+  display: grid;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.ei-demo-completion::before {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--green, #34d399);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.ei-demo-completion.is-visible::before {
+  animation: ei-demo-completion-ripple 2.5s ease-out infinite;
+}
+
+.ei-demo-completion-dot {
+  position: relative;
+  z-index: 1;
+  width: 6px;
+  height: 6px;
+  background: var(--green, #34d399);
+  box-shadow: 0 0 6px 1px rgba(52, 211, 153, 0.45);
+}
+
+@keyframes ei-demo-completion-ripple {
+  0% {
+    width: 8px;
+    height: 8px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+  }
+}
+
+.ei-demo-key {
+  position: relative;
+  display: block;
+  width: var(--key-width, 52px);
+  height: 58px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+}
+
+.ei-demo-key-side,
+.ei-demo-key-face {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border: 1px solid var(--border-active, #333);
+}
+
+.ei-demo-key-side {
+  top: 46px;
+  height: 12px;
+  z-index: 0;
+  background: #1a1a1a;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.ei-demo-key-face {
+  top: 0;
+  height: 52px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: #000;
+  color: rgba(255, 255, 255, 0.6);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1),
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.ei-demo-key-label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 52px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+  transition:
+    transform 0.3s ease,
+    color 0.2s ease;
+}
+
+.ei-demo-key[aria-label="Play or pause"] .ei-demo-key-label {
+  font-size: 15px;
+}
+
+.ei-demo-key.is-pressed .ei-demo-key-face {
+  transform: translateY(6px);
+  background: #141414;
+  border-color: #666;
+}
+
+.ei-demo-key.is-pressed .ei-demo-key-side {
+  background: #111;
+  border-color: #666;
+}
+
+.ei-demo-key.is-pressed .ei-demo-key-label {
+  transform: translateY(1px);
+  color: #fff;
+}
+
+.ei-demo-key:focus-visible,
+.ei-demo-symbol:focus-visible,
+.ei-demo-settings-button:focus-visible,
+.ei-demo-speed:focus-visible,
+.ei-demo-send:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+
+.ei-demo-arrow-group {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.ei-demo-arrow-group.is-visible {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.ei-demo-arrow-up {
+  margin-bottom: -7px;
+}
+
+.ei-demo-arrow-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ei-demo-arrow-row .ei-demo-key + .ei-demo-key {
+  margin-left: -1.5px;
+}
+
+/* WelcomeControls */
+.ei-demo-controls {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  width: 100%;
+}
+
+.ei-demo-control-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.ei-demo-symbol {
+  width: 52px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.ei-demo-symbol:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+.ei-demo-symbol.is-highlighted {
+  color: #fff;
+  transform: scale(1.1);
+}
+.ei-demo-symbol-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.ei-demo-restart.is-rotated {
+  transform: rotate(-360deg);
+}
+
+.ei-demo-restart.is-rotated.is-highlighted {
+  transform: rotate(-360deg) scale(1.05);
+}
+
+.ei-demo-seek-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 0;
+}
+
+.ei-demo-seek-keys {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.ei-demo-control-label {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  letter-spacing: 0.025em;
+  transform: translateY(0);
+  transition:
+    color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.25s ease;
+}
+
+.ei-demo-control-label.is-highlighted {
+  color: #fff;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* WelcomeFeedback */
+.ei-demo-feedback {
+  min-height: 300px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.ei-demo-feedback-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.ei-demo-feedback-stage.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.ei-demo-settings-stage {
+  width: 160px;
+  height: 160px;
+  inset: auto;
+}
+
+.ei-demo-settings-button {
+  position: absolute;
+  left: 60px;
+  top: 60px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.ei-demo-settings-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ei-demo-settings-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.ei-demo-cursor {
+  position: absolute;
+  left: 220px;
+  top: 220px;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 25px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+  transform: translate(-2px, -2px) scale(var(--cursor-scale, 1));
+  transform-origin: 0 0;
+  transition:
+    left 0.8s cubic-bezier(0.2, 0.7, 0.3, 1),
+    top 0.8s cubic-bezier(0.2, 0.7, 0.3, 1),
+    opacity 0.2s ease,
+    transform 0.15s ease;
+}
+
+.ei-demo-cursor-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.ei-demo-click-ripple {
+  position: absolute;
+  left: 80px;
+  top: 80px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.25);
+  pointer-events: none;
+}
+
+.ei-demo-click-ripple.is-visible {
+  animation: ei-demo-click-ripple 1.2s ease-out both;
+}
+
+@keyframes ei-demo-click-ripple {
+  0% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%) scale(0.25);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.5);
+  }
+}
+
+.ei-demo-playback-stage {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ei-demo-speed-icon,
+.ei-demo-feedback-icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ei-demo-speed-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  max-width: 385px;
+}
+
+.ei-demo-speed {
+  position: relative;
+  min-width: 62px;
+  padding: 8px 12px;
+  border: 0;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  transition:
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.ei-demo-speed:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.ei-demo-speed.is-selected {
+  color: #000;
+  background: #fff;
+}
+
+.ei-demo-feedback-form {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ei-demo-feedback-message {
+  min-width: 220px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+  text-align: center;
+}
+
+.ei-demo-send {
+  min-width: 64px;
+  min-height: 28px;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  font-size: 12px;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.ei-demo-send:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+}
+.ei-demo-send.is-pressed {
+  transform: translateY(1px) scale(0.95);
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.ei-demo-send.is-sent {
+  color: var(--green, #34d399);
+  border-color: rgba(52, 211, 153, 0.5);
+}
+.ei-demo-send-status {
+  color: var(--green, #34d399);
+  font-size: 12px;
+  min-height: 14px;
+}
+
+/* EffectTypeDisplay */
+.ei-demo-type {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 0;
+}
+
+.ei-demo-type-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgb(10, 10, 10);
+  color: #f4f4f5;
+  overflow: hidden;
+}
+
+.ei-demo-type-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  font-size: clamp(14px, 2vw, 18px);
+  white-space: pre;
+}
+
+.ei-demo-type-token {
+  display: inline-block;
+  animation: ei-demo-token-in 0.35s ease both;
+}
+
+.ei-demo-type-token.bracket {
+  color: #e4e4e7;
+}
+.ei-demo-type-token.success {
+  color: #4ade80;
+}
+.ei-demo-type-token.error {
+  color: #f87171;
+}
+.ei-demo-type-token.requirements {
+  color: #60a5fa;
+}
+.ei-demo-type-token.comma {
+  color: #a1a1aa;
+}
+.ei-demo-type-token.label {
+  color: #71717a;
+}
+
+@keyframes ei-demo-token-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateX(-3px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0);
+  }
+}
+
+.ei-demo-type-labels {
+  min-height: 48px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 18px;
+  font-size: 12px;
+}
+
+.ei-demo-type-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: ei-demo-token-in 0.35s ease both;
+}
+
+.ei-demo-type-label.success {
+  color: #4ade80;
+}
+.ei-demo-type-label.error {
+  color: #f87171;
+}
+.ei-demo-type-label.requirements {
+  color: #60a5fa;
+}
+.ei-demo-type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@media (max-width: 560px) {
+  .ei-demo-controls {
+    gap: 36px;
+  }
+  .ei-demo-speed {
+    min-width: 54px;
+    padding-inline: 8px;
+  }
+  .ei-demo-feedback-message {
+    min-width: 190px;
+  }
+  .ei-demo-type {
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .effect-demo-root *,
+  .effect-demo-root *::before,
+  .effect-demo-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .effect-demo-root button,
+  .ei-demo-type-card,
+  .ei-demo-feedback-message {
+    border: 1px solid CanvasText;
+  }
+  .ei-demo-key-side,
+  .ei-demo-key-face,
+  .ei-demo-settings-button {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

@@ -1,0 +1,33 @@
+.tutorial-cursor {
+  --tutorial-cursor-glow: #b8dce9;
+  position: absolute;
+  pointer-events: none;
+  transform-origin: 12px 12px;
+  transition: none;
+}
+
+.tutorial-cursor-art {
+  position: absolute;
+  left: 12px;
+  top: -2.5px;
+  transform: rotate(44deg);
+  transform-origin: 0 0;
+}
+
+.tutorial-cursor-art img {
+  display: block;
+  width: 23px;
+  height: 24px;
+}
+
+.tutorial-cursor-art img,
+.tutorial-cursor-hand {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--tutorial-cursor-glow) 75%, transparent))
+    drop-shadow(0 0 15px color-mix(in srgb, var(--tutorial-cursor-glow) 35%, transparent));
+}
+
+.tutorial-cursor .tutorial-cursor-hand {
+  display: block;
+  width: 24px;
+  height: 24px;
+}

@@ -1,6 +1,6 @@
 ---
 name: council
-description: 'Convene other frontier models for second opinions or multi-round debate on a decision, design, diagnosis, or review. Seats: GPT-5.6 Sol (codex CLI), Claude Opus 5 (cursor-agent CLI), Claude Fable 5 (claude CLI), Grok 4.6 (grok CLI), all at high reasoning effort with full tool access; plus GPT-6 Astra (codex CLI, medium effort) as an expert-review seat only. Use when asked to "consult the council", "roundtable this", "ask the other models", "get a second opinion", "debate this across models", or before committing to a contested technical choice.'
+description: 'Convene other frontier models for second opinions or multi-round debate on a decision, design, diagnosis, or review. Seats: GPT-5.6 Sol (codex CLI), Claude Opus 5 (cursor-agent CLI), Claude Fable 5.1 (claude CLI), Grok 4.6 (grok CLI), all at high reasoning effort with full tool access; plus GPT-6 Astra (codex CLI, medium effort) as an expert-review seat only. Use when asked to "consult the council", "roundtable this", "ask the other models", "get a second opinion", "debate this across models", or before committing to a contested technical choice.'
 ---
 
 # council
@@ -15,7 +15,7 @@ Convene every seat except the model you are. Three is the normal panel, two is q
 |---|---|
 | GPT-5.6 Sol | `codex exec -m gpt-5.6-sol -c model_reasoning_effort=high -s danger-full-access -o "$d/sol_r1_last.md" - < "$d/brief.md" > "$d/sol_r1.log" 2>&1` |
 | Claude Opus 5 | `cursor-agent -p --output-format json --trust --force --model claude-opus-5-thinking-high "$(cat "$d/brief.md")" > "$d/opus_r1.json"` (answer in `.result`; the file itself is the `_last` for this seat) |
-| Claude Fable 5 | `claude -p --model claude-fable-5 --effort high --dangerously-skip-permissions --session-id "$FAB_ID" < "$d/brief.md" > "$d/fable_r1_last.md"` |
+| Claude Fable 5.1 | `claude -p --model claude-fable-5-1 --effort high --dangerously-skip-permissions --session-id "$FAB_ID" < "$d/brief.md" > "$d/fable_r1_last.md"` |
 | Grok 4.6 | `grok --prompt-file "$d/brief.md" -m grok-4.6 --reasoning-effort high --permission-mode bypassPermissions --session-id "$GROK_ID" > "$d/grok_r1_last.md"` |
 | GPT-6 Astra (review seat only) | `codex exec -m gpt-6-astra -c model_reasoning_effort=medium -s danger-full-access -o "$d/astra_r1_last.md" - < "$d/brief.md" > "$d/astra_r1.log" 2>&1` |
 
@@ -74,7 +74,7 @@ Debate rounds resume each seat with the others' positions. Between rounds, write
 |---|---|
 | GPT-5.6 Sol | `codex exec resume "$SOL_ID" -o "$d/sol_r${n}_last.md" - < "$d/circ_sol.md" > "$d/sol_r$n.log" 2>&1` |
 | Claude Opus 5 | `cursor-agent -p --resume "$OPUS_ID" --output-format text --trust --force --model claude-opus-5-thinking-high "$(cat "$d/circ_opus.md")" > "$d/opus_r${n}_last.md"` |
-| Claude Fable 5 | `claude -p --resume "$FAB_ID" --model claude-fable-5 --effort high --dangerously-skip-permissions < "$d/circ_fable.md" > "$d/fable_r${n}_last.md"` |
+| Claude Fable 5.1 | `claude -p --resume "$FAB_ID" --model claude-fable-5-1 --effort high --dangerously-skip-permissions < "$d/circ_fable.md" > "$d/fable_r${n}_last.md"` |
 | Grok 4.6 | `grok -p "$(cat "$d/circ_grok.md")" --resume "$GROK_ID" -m grok-4.6 --reasoning-effort high --permission-mode bypassPermissions > "$d/grok_r${n}_last.md"` |
 | GPT-6 Astra (review seat only) | `codex exec resume "$ASTRA_ID" -o "$d/astra_r${n}_last.md" - < "$d/circ_astra.md" > "$d/astra_r$n.log" 2>&1` |
 

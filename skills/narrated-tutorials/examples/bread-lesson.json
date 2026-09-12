@@ -1,0 +1,412 @@
+{
+  "course": {
+    "id": "how-bread-rises",
+    "title": "How bread rises",
+    "description": "From a living yeast cell to an airy loaf. Three short explanations you can explore or play straight through.",
+    "brand": "Small Lessons",
+    "wordmark": "SMALL LESSONS",
+    "footerLabel": "A NARRATED TUTORIAL",
+    "footerLinks": []
+  },
+  "chapters": [
+    {
+      "id": "inside-the-dough",
+      "title": "Inside the dough",
+      "description": "Gas and the network that holds it.",
+      "sections": [
+        {
+          "id": "gas",
+          "title": "Where the bubbles come from",
+          "text": "Yeast feeds on sugars in the dough. As it feeds, it releases carbon dioxide. Tiny pockets of gas begin to form.",
+          "audio": "audio/gas.wav",
+          "alignment": "audio/gas.aligned.json",
+          "scenes": [
+            {
+              "time": 0,
+              "nodes": [
+                {
+                  "id": "sugar",
+                  "label": "Sugars",
+                  "x": 6.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                },
+                {
+                  "id": "yeast",
+                  "label": "Yeast",
+                  "x": 38.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                }
+              ],
+              "edges": [
+                {
+                  "from": "sugar",
+                  "to": "yeast"
+                }
+              ],
+              "highlight": "yeast",
+              "cursor": {
+                "target": "yeast",
+                "type": "hand"
+              }
+            },
+            {
+              "atWord": "carbon",
+              "nodes": [
+                {
+                  "id": "sugar",
+                  "label": "Sugars",
+                  "x": 6.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                },
+                {
+                  "id": "yeast",
+                  "label": "Yeast",
+                  "x": 38.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                },
+                {
+                  "id": "gas",
+                  "label": "Carbon dioxide",
+                  "x": 68.0,
+                  "y": 38.5,
+                  "width": 28,
+                  "height": 19
+                }
+              ],
+              "edges": [
+                {
+                  "from": "sugar",
+                  "to": "yeast"
+                },
+                {
+                  "from": "yeast",
+                  "to": "gas"
+                }
+              ],
+              "highlight": "gas",
+              "cursor": {
+                "target": "gas",
+                "type": "pointer"
+              }
+            },
+            {
+              "atWord": "pockets",
+              "nodes": [
+                {
+                  "id": "sugar",
+                  "label": "Sugars",
+                  "x": 6.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                },
+                {
+                  "id": "yeast",
+                  "label": "Yeast",
+                  "x": 38.0,
+                  "y": 38.5,
+                  "width": 24,
+                  "height": 19
+                },
+                {
+                  "id": "gas",
+                  "label": "Carbon dioxide",
+                  "x": 68.0,
+                  "y": 38.5,
+                  "width": 28,
+                  "height": 19
+                }
+              ],
+              "edges": [
+                {
+                  "from": "sugar",
+                  "to": "yeast"
+                },
+                {
+                  "from": "yeast",
+                  "to": "gas"
+                }
+              ],
+              "highlight": "gas",
+              "cursor": {
+                "target": "gas",
+                "type": "pointer"
+              },
+              "emojis": [
+                {
+                  "emoji": "🫧",
+                  "target": "gas"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "network",
+          "title": "A net that holds the gas",
+          "text": "Mixing flour and water creates a dough. Stretching and folding helps a gluten network develop. That network holds the gas as the dough expands.",
+          "audio": "audio/network.wav",
+          "alignment": "audio/network.aligned.json",
+          "scenes": [
+            {
+              "time": 0,
+              "cards": [
+                {
+                  "id": "ingredients",
+                  "title": "Flour + water",
+                  "body": "Mix into a dough",
+                  "x": 6.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                },
+                {
+                  "id": "net",
+                  "title": "Gluten network",
+                  "body": "Holds pockets of gas",
+                  "x": 56.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                }
+              ],
+              "edges": [
+                {
+                  "from": "ingredients",
+                  "to": "net"
+                }
+              ],
+              "highlight": "ingredients",
+              "cursor": {
+                "target": "ingredients",
+                "type": "hand"
+              }
+            },
+            {
+              "atWord": "Stretching",
+              "cards": [
+                {
+                  "id": "ingredients",
+                  "title": "Flour + water",
+                  "body": "Mix into a dough",
+                  "x": 6.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                },
+                {
+                  "id": "net",
+                  "title": "Gluten network",
+                  "body": "Holds pockets of gas",
+                  "x": 56.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                }
+              ],
+              "edges": [
+                {
+                  "from": "ingredients",
+                  "to": "net"
+                }
+              ],
+              "highlight": "net",
+              "cursor": {
+                "target": "net",
+                "type": "hand"
+              }
+            },
+            {
+              "atWord": "expands.",
+              "cards": [
+                {
+                  "id": "ingredients",
+                  "title": "Flour + water",
+                  "body": "Mix into a dough",
+                  "x": 6.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                },
+                {
+                  "id": "net",
+                  "title": "Gluten network",
+                  "body": "Holds pockets of gas",
+                  "x": 56.5,
+                  "y": 27.5,
+                  "width": 35,
+                  "height": 25
+                }
+              ],
+              "edges": [
+                {
+                  "from": "ingredients",
+                  "to": "net"
+                }
+              ],
+              "highlight": "net",
+              "cursor": {
+                "target": "net",
+                "type": "hand"
+              },
+              "emojis": [
+                {
+                  "emoji": "🫧",
+                  "target": "net"
+                }
+              ]
+            }
+          ],
+          "frames": [
+            {
+              "time": 0,
+              "lines": [
+                {
+                  "id": "formula",
+                  "text": "flour + water → dough"
+                }
+              ],
+              "spotlight": {
+                "lineId": "formula",
+                "start": 0,
+                "end": 13
+              },
+              "cursor": {
+                "lineId": "formula",
+                "start": 0,
+                "end": 13,
+                "type": "hand"
+              }
+            },
+            {
+              "atWord": "network",
+              "lines": [
+                {
+                  "id": "formula",
+                  "text": "gluten network → trapped gas"
+                }
+              ],
+              "spotlight": {
+                "lineId": "formula",
+                "start": 0,
+                "end": 14
+              },
+              "cursor": {
+                "lineId": "formula",
+                "start": 17,
+                "end": 28,
+                "type": "pointer"
+              },
+              "bursts": [
+                {
+                  "lineId": "formula",
+                  "start": 17,
+                  "end": 28,
+                  "emoji": "🫧"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "in-the-oven",
+      "title": "In the oven",
+      "description": "Heat makes the structure last.",
+      "sections": [
+        {
+          "id": "heat",
+          "title": "Heat turns dough into bread",
+          "text": "In the oven, the trapped gas expands further. Heat sets the structure of the loaf. The result is bread with an airy crumb.",
+          "audio": "audio/heat.wav",
+          "alignment": "audio/heat.aligned.json",
+          "scenes": [
+            {
+              "time": 0,
+              "cards": [
+                {
+                  "id": "oven",
+                  "title": "Heat",
+                  "body": "The gas expands",
+                  "x": 8.5,
+                  "y": 30.0,
+                  "width": 29,
+                  "height": 28
+                },
+                {
+                  "id": "loaf",
+                  "title": "An airy crumb",
+                  "image": "images/crumb.svg",
+                  "x": 52.5,
+                  "y": 19.0,
+                  "width": 39,
+                  "height": 50
+                }
+              ],
+              "edges": [
+                {
+                  "from": "oven",
+                  "to": "loaf"
+                }
+              ],
+              "highlight": "oven",
+              "cursor": {
+                "target": "oven",
+                "type": "hand"
+              }
+            },
+            {
+              "atWord": "structure",
+              "cards": [
+                {
+                  "id": "oven",
+                  "title": "Heat",
+                  "body": "The gas expands",
+                  "x": 8.5,
+                  "y": 30.0,
+                  "width": 29,
+                  "height": 28
+                },
+                {
+                  "id": "loaf",
+                  "title": "An airy crumb",
+                  "image": "images/crumb.svg",
+                  "x": 52.5,
+                  "y": 19.0,
+                  "width": 39,
+                  "height": 50
+                }
+              ],
+              "edges": [
+                {
+                  "from": "oven",
+                  "to": "loaf"
+                }
+              ],
+              "highlight": "loaf",
+              "cursor": {
+                "target": "loaf",
+                "type": "pointer"
+              },
+              "emojis": [
+                {
+                  "emoji": "🍞",
+                  "target": "loaf"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

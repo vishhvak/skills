@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>effect.institute</title>
+    <link rel="icon" href="/fonts/favicon-32x32.png" />
+    <link
+      rel="preload"
+      href="/fonts/CommitMono-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/styles.css?v=4a413355cb6a" />
+    <link rel="stylesheet" href="/demos.css?v=557bdf1a2021" />
+    <link rel="stylesheet" href="/code-stage.css?v=cf166ee87e24" />
+    <link rel="stylesheet" href="/basics-demos.css?v=4185fe467db3" />
+    <link rel="stylesheet" href="/cursor.css" />
+  </head>
+  <body>
+    <main id="home" class="home">
+      <header class="home-top">
+        <a class="wordmark" href="/" aria-label="Effect Institute"
+          >EFFECT INSTITUTE</a
+        >
+        <button
+          class="user-button"
+          aria-label="Local profile"
+          title="Progress is saved on this device"
+        >
+          V
+        </button>
+      </header>
+      <div
+        class="feedback-ticker"
+        role="region"
+        aria-label="Learner feedback ticker"
+      >
+        <div class="ticker-track" id="ticker-track"></div>
+      </div>
+      <div class="hero">
+        <canvas class="dotgrid" aria-hidden="true"></canvas>
+        <div class="badge" id="home-badge" aria-hidden="true"></div>
+      </div>
+      <div class="chapters-head">
+        <h1>Chapters</h1>
+        <button id="btn-continue" class="continue-btn hidden">
+          Continue <span>→</span>
+        </button>
+      </div>
+      <div id="chapter-list" class="chapter-list" aria-live="polite"></div>
+      <footer class="home-foot">
+        <a
+          href="https://effect.website"
+          target="_blank"
+          rel="noopener noreferrer"
+          >EFFECT OR ☠</a
+        >
+        <div class="footer-links"></div>
+      </footer>
+    </main>
+    <main id="player" class="player hidden">
+      <div class="lesson-column">
+        <header class="bar top-bar">
+          <a
+            id="btn-home"
+            class="icon-btn"
+            href="/"
+            aria-label="Back to home"
+            title="Back to home"
+          ></a>
+          <button
+            id="chapter-title"
+            class="chapter-title-btn"
+            aria-expanded="false"
+            aria-controls="section-menu"
+          ></button>
+          <button
+            id="btn-settings"
+            class="icon-btn"
+            aria-label="Open menu"
+            title="Settings"
+            aria-expanded="false"
+            aria-controls="rate-popover"
+          ></button>
+        </header>
+        <section
+          id="narration"
+          class="narration"
+          aria-label="Narration"
+        ></section>
+        <nav
+          id="section-menu"
+          class="section-menu hidden"
+          aria-label="Chapter sections"
+        ></nav>
+        <footer class="bar bottom-bar">
+          <div class="bar-left">
+            <button
+              id="btn-restart"
+              class="icon-btn"
+              aria-label="Restart section"
+              title="Restart section (R)"
+            ></button
+            ><button
+              id="btn-play"
+              class="icon-btn"
+              aria-label="Play"
+              title="Play (Space)"
+            ></button
+            ><button
+              id="btn-continuous"
+              class="continuous-toggle"
+              type="button"
+              aria-pressed="false"
+              aria-label="Continuous play: off"
+              title="Continuous play (off)"
+            >
+              <span class="continuous-indicator" aria-hidden="true"></span
+              ><span>Continuous play</span>
+            </button>
+          </div>
+          <div class="bar-right">
+            <button
+              id="btn-prev"
+              class="icon-btn"
+              aria-label="Previous section"
+              title="Previous section (↑)"
+            ></button>
+            <div class="bar-center" id="counter">1 / 17</div>
+            <button
+              id="btn-next"
+              class="icon-btn"
+              aria-label="Next section"
+              title="Next section (↓)"
+            ></button>
+          </div>
+        </footer>
+        <div
+          id="rate-popover"
+          class="rate-popover hidden"
+          aria-label="Settings"
+        ></div>
+      </div>
+      <div class="visual-column">
+        <header class="visual-top">
+          <button
+            class="user-button"
+            aria-label="Local profile"
+            title="Progress is saved on this device"
+          >
+            V
+          </button>
+        </header>
+        <section
+          id="codepane"
+          class="codepane"
+          aria-label="Visual stage"
+        ></section>
+        <footer class="visual-foot footer-links"></footer>
+      </div>
+      <section class="mobile-notice" aria-label="Desktop required">
+        <header><a href="/" id="mobile-home">⌂ HOME</a></header>
+        <div class="mobile-notice-body">
+          <canvas class="dotgrid" aria-hidden="true"></canvas>
+          <div id="mobile-badge"></div>
+          <p>This interactive course is designed for desktop.</p>
+          <p>Please visit on a larger screen.</p>
+        </div>
+        <footer class="footer-links"></footer>
+      </section>
+      <div id="edge-dots" aria-hidden="true">
+        <i class="ed top"></i><i class="ed bottom"></i><i class="ed left"></i
+        ><i class="ed right"></i>
+      </div>
+    </main>
+    <div id="jump-pill" class="hidden" aria-hidden="true"></div>
+    <div id="notice" class="notice hidden" role="status"></div>
+    <dialog id="feedback-dialog" aria-labelledby="feedback-title">
+      <form id="feedback-form" novalidate>
+        <header>
+          <h2 id="feedback-title">Feedback</h2>
+          <button
+            type="button"
+            id="feedback-close"
+            class="icon-btn"
+            aria-label="Close feedback"
+          >
+            ×
+          </button>
+        </header>
+        <label for="feedback-text">How could this lesson be better?</label
+        ><textarea
+          id="feedback-text"
+          rows="5"
+          placeholder="What's on your mind?"
+        ></textarea>
+        <p id="feedback-status" role="status">
+          Feedback is saved on this device.
+        </p>
+        <button class="send-button" type="submit">Save feedback</button>
+      </form>
+    </dialog>
+    <script src="/cursor-motion.js"></script>
+    <script src="/cursor-visuals.js"></script>
+    <script src="/demos.js?v=95f7ce5c11a0"></script>
+    <script src="/code-stage.js?v=ab156cda24cf"></script>
+    <script src="/basics-demos.js?v=806be79d0278"></script>
+    <script src="/app.js?v=efe7a4ecc9d8"></script>
+  </body>
+</html>

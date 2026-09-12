@@ -1,0 +1,8 @@
+# Local agent sessions and working artifacts.
+.claude/
+.agents/work/
+# Python tool caches.
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.DS_Store

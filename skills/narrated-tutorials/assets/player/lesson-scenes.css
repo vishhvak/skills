@@ -1,0 +1,245 @@
+/* Portable, subject-neutral scene stage. Coordinates are percentages emitted
+   by scaffold_tutorial.py, so the same snapshot scales with its viewport. */
+.lesson-scenes-root {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 360px;
+  flex: 1 1 auto;
+  align-self: stretch;
+  display: block;
+}
+
+.lesson-scenes-stage {
+  --scene-stage-background: rgba(16, 18, 23, 0.96);
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: var(--scene-stage-background);
+  isolation: isolate;
+  transition: background-color 220ms ease;
+}
+
+.lesson-scenes-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.lesson-scenes-edges {
+  z-index: 1;
+}
+
+.lesson-scenes-nodes,
+.lesson-scenes-cards {
+  z-index: 2;
+}
+
+.lesson-scenes-labels {
+  z-index: 3;
+}
+
+.lesson-scenes-emojis {
+  z-index: 4;
+}
+
+.lesson-scene-item {
+  --scene-color: rgba(238, 241, 247, 0.9);
+  --scene-background: rgba(34, 39, 50, 0.94);
+  --scene-highlight: #f7c948;
+  position: absolute;
+  box-sizing: border-box;
+  transform: rotate(var(--scene-rotation, 0deg));
+  transform-origin: center;
+  color: var(--scene-color);
+  opacity: 1;
+  transition:
+    left 260ms ease,
+    top 260ms ease,
+    width 260ms ease,
+    min-height 260ms ease,
+    opacity 180ms ease,
+    filter 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.lesson-scene-node {
+  display: grid;
+  place-items: center;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--scene-color) 50%, transparent);
+  border-radius: 10px;
+  background: var(--scene-background);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  text-align: center;
+}
+
+.lesson-scene-card {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  background: var(--scene-background);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24);
+}
+
+.lesson-scene-label {
+  display: flex;
+  align-items: center;
+  padding: 3px 6px;
+  color: var(--scene-color);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.lesson-scene-copy {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lesson-scene-node-label,
+.lesson-scene-card-title {
+  color: inherit;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.lesson-scene-node-detail,
+.lesson-scene-card-body {
+  color: rgba(235, 239, 246, 0.62);
+  font-size: 0.8rem;
+  line-height: 1.32;
+}
+
+.lesson-scene-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lesson-scene-link:hover {
+  text-decoration: underline;
+}
+
+.lesson-scene-image {
+  width: 28%;
+  min-width: 34px;
+  max-width: 120px;
+  aspect-ratio: 1;
+  align-self: center;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.lesson-scene-item.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lesson-scene-item.is-muted {
+  filter: saturate(0.35);
+  opacity: 0.52;
+}
+
+.lesson-scene-item.is-selected,
+.lesson-scene-item.is-highlighted {
+  border-color: var(--scene-highlight, #f7c948);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--scene-highlight, #f7c948) 24%, transparent),
+    0 14px 38px color-mix(in srgb, var(--scene-highlight, #f7c948) 18%, transparent);
+  filter: brightness(1.12);
+}
+
+.lesson-scene-edge {
+  --scene-edge-color: rgba(205, 214, 230, 0.48);
+  position: absolute;
+  height: 1px;
+  transform-origin: left center;
+  background: var(--scene-edge-color);
+  transition:
+    left 260ms ease,
+    top 260ms ease,
+    width 260ms ease,
+    transform 260ms ease;
+}
+
+.lesson-scene-edge[data-dashed="true"] {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--scene-edge-color) 0 7px,
+    transparent 7px 12px
+  );
+}
+
+.lesson-scene-edge[data-directed="true"]::after {
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 7px solid var(--scene-edge-color);
+  content: "";
+}
+
+.lesson-scene-edge-label {
+  position: absolute;
+  left: 50%;
+  top: -0.7rem;
+  padding: 1px 5px;
+  transform: translateX(-50%) rotate(calc(var(--scene-angle, 0rad) * -1));
+  color: rgba(235, 239, 246, 0.62);
+  background: rgba(16, 18, 23, 0.8);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.lesson-scene-emoji {
+  position: absolute;
+  display: block;
+  transform: translate(-50%, -50%) scale(0.78);
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  opacity: 0;
+  transition:
+    left 260ms ease,
+    top 260ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.lesson-scene-emoji.is-visible {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.lesson-scene-cursor {
+  z-index: 5;
+}
+
+.lesson-scenes-stage.is-seeking .lesson-scene-item,
+.lesson-scenes-stage.is-seeking .lesson-scene-edge,
+.lesson-scenes-stage.is-seeking .lesson-scene-emoji,
+.lesson-scenes-stage.is-seeking .lesson-scene-cursor {
+  transition-duration: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-scene-item,
+  .lesson-scene-edge,
+  .lesson-scene-emoji,
+  .lesson-scene-cursor {
+    transition-duration: 0ms;
+  }
+}
