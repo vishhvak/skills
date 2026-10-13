@@ -1,0 +1,4 @@
+[
+  { "id": "src-gazette", "kind": "gov", "url": "https://example.org/lowmoor/gazette/2022-06-14", "publisher": "Lowmoor Gazette (fictional)", "title": "Council approves bridge contract", "publishedAt": "2022-06-14" },
+  { "id": "src-harbor", "kind": "press", "url": "https://example.org/harbor-works/news/funding", "publisher": "Harbor Works (fictional)", "title": "Harbor Works closes bridge financing", "publishedAt": "2022-09-02" }
+]

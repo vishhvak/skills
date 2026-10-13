@@ -1,0 +1,14 @@
+{
+  "name": "Lowmoor Bridge (fictional example)",
+  "locales": ["en"],
+  "rtl": [],
+  "dateRange": ["2021-01", "2024-12"],
+  "tracks": [
+    { "id": "builders", "name": "Builders", "color": "#d9a441" },
+    { "id": "council", "name": "Council", "color": "#5b8fd9" },
+    { "id": "money", "name": "Money", "color": "#6fbf73" }
+  ],
+  "vocab": {
+    "eventKinds": ["vote", "contract", "funding", "groundbreaking", "opening"]
+  }
+}

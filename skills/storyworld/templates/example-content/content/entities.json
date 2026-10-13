@@ -1,0 +1,33 @@
+[
+  {
+    "id": "lowmoor-council",
+    "slug": "lowmoor-council",
+    "kind": "agency",
+    "name": "Lowmoor Town Council",
+    "trackIds": [
+      "council"
+    ],
+    "firstSeen": "2022-06"
+  },
+  {
+    "id": "harbor-works",
+    "slug": "harbor-works",
+    "kind": "company",
+    "name": "Harbor Works Ltd",
+    "trackIds": [
+      "builders"
+    ],
+    "firstSeen": "2022-06"
+  },
+  {
+    "id": "river-fund",
+    "slug": "river-fund",
+    "kind": "fund",
+    "name": "River Valley Fund",
+    "trackIds": [
+      "money"
+    ],
+    "firstSeen": "2022-09",
+    "portraitId": "chart-funding"
+  }
+]

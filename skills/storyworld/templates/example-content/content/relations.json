@@ -1,0 +1,4 @@
+[
+  { "id": "rel-1", "from": "river-fund", "to": "harbor-works", "type": "invests_in", "start": "2022-09", "sourceIds": ["src-harbor"] },
+  { "id": "rel-2", "from": "lowmoor-council", "to": "harbor-works", "type": "partners", "start": "2022-06-14", "sourceIds": ["src-gazette"] }
+]

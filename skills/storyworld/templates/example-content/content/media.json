@@ -1,0 +1,22 @@
+[
+  {
+    "id": "chart-funding",
+    "kind": "generated",
+    "generatedKind": "chart",
+    "src": "media/funding.svg",
+    "credit": "Example chart",
+    "license": "CC0",
+    "sourceUrl": "https://example.org/harbor-works/news/funding",
+    "alt": "Bar showing 40 million in bridge financing"
+  },
+  {
+    "id": "map-site",
+    "kind": "generated",
+    "generatedKind": "map",
+    "src": "media/site-map.svg",
+    "credit": "Example map",
+    "license": "CC0",
+    "sourceUrl": "https://example.org/lowmoor/gazette/2022-06-14",
+    "alt": "Sketch map of the river crossing at Lowmoor"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "ev-contract",
+    "slug": "council-awards-bridge-contract",
+    "date": "2022-06-14",
+    "datePrecision": "day",
+    "trackId": "council",
+    "kind": "vote",
+    "title": "Council awards the bridge contract",
+    "body": "{Lowmoor Town Council:lowmoor-council} voted 7 to 2 to give the bridge contract to {Harbor Works:harbor-works}, ending two years of argument over whether the town could afford a crossing at all. The two votes against came from members who wanted a ferry instead. Construction was expected to begin the following spring.",
+    "entityIds": [
+      "lowmoor-council",
+      "harbor-works"
+    ],
+    "sourceIds": [
+      "src-gazette"
+    ],
+    "confidence": "confirmed",
+    "claims": [
+      {
+        "text": "The council voted 7 to 2 for Harbor Works.",
+        "sourceIds": [
+          "src-gazette"
+        ],
+        "confidence": "confirmed",
+        "quote": "voted 7 to 2 on Tuesday to award the bridge contract to Harbor Works Ltd"
+      }
+    ],
+    "importance": 2,
+    "mediaIds": [
+      "map-site"
+    ]
+  },
+  {
+    "id": "ev-funding",
+    "slug": "harbor-works-closes-financing",
+    "date": "2022-09",
+    "datePrecision": "month",
+    "trackId": "money",
+    "kind": "funding",
+    "title": "Harbor Works closes bridge financing",
+    "body": "{River Valley Fund:river-fund} put 40 million into the project three months after the {council vote:ev-contract}. The money covered the steel and the first year of work, and it made the fund the largest private backer of the bridge. {Harbor Works:harbor-works} had warned the council that without outside financing the start date would slip.",
+    "entityIds": [
+      "harbor-works",
+      "river-fund"
+    ],
+    "sourceIds": [
+      "src-harbor"
+    ],
+    "mediaIds": [
+      "chart-funding"
+    ],
+    "confidence": "reported",
+    "amountUsd": 40000000,
+    "claims": [
+      {
+        "text": "River Valley Fund provided 40 million.",
+        "sourceIds": [
+          "src-harbor"
+        ],
+        "quote": "secured 40 million in financing from the River Valley Fund"
+      }
+    ],
+    "importance": 3
+  }
+]
