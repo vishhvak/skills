@@ -24,6 +24,8 @@ const LOCK = path.join(os.tmpdir(), 'storyworld-measure.lock');
 const PLACEHOLDER = /<fill>/;
 const [cmd, ...argv] = process.argv.slice(2);
 
+// A reader that closes the pipe early (`| head`) ends the output, not the command's work.
+process.stdout.on('error', (e) => { if (e.code !== 'EPIPE') throw e; });
 const out = (s = '') => process.stdout.write(s + '\n');
 const flag = (name, def) => {
   const i = argv.indexOf(`--${name}`);
