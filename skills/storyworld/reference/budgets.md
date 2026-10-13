@@ -35,6 +35,16 @@ configs C and D.
 | Time to interactive | Navigation start until the first control accepts input, with a warm cache |
 | Reduced motion, no-WebGL | A flow run with `prefers-reduced-motion: reduce` emulated, and one with WebGL disabled; both must reach every step |
 
+## Stand-ins for hardware you cannot reach
+
+Measure on the nearest stand-in the host has, label it as a stand-in, and keep the real device listed as untested.
+
+| Missing hardware | Stand-in |
+|---|---|
+| A laptop integrated GPU | The host's own integrated GPU, if it has one. With Mesa: `MESA_VK_DEVICE_SELECT=<vendor:device> MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE=1` before launching Chrome (`--use-angle=vulkan`). `lspci` and `/sys/class/drm/card*/device/{vendor,device}` give the ids. Record the WebGL renderer string in every run, to prove which GPU drew it |
+| A high-refresh display | `--disable-gpu-vsync --disable-frame-rate-limit`: the frame loop runs uncapped. Check that every active window stays smooth, and that every per-frame smoothing step is scaled by elapsed time (`1 - (1 - a) ** (dt * 60)`), not applied once per frame |
+| Safari | WebKit through Playwright, for crashes and relative pacing only (see "Noise" below) |
+
 ## Protocol
 
 1. **One timing at a time, on a quiet host.** Wrap every timing command in
@@ -43,6 +53,8 @@ configs C and D.
    - It prints `DISCARD` if the load rose above N during the run.
    - Record no numbers from a `DISCARD`, `NOT_QUIET` or `BUSY` result.
    - Cross-browser flows, builds and other agents' jobs all count as load.
+   - Write each batch of runs as a `#!/bin/bash` script file. In zsh, `set -- $pair` and `$cmd args` do not split on
+     spaces, so an inline loop runs every command with an empty argument.
 2. **Check validity before reading numbers.**
    - The run reached every step.
    - The heap is the size of the real page: a heap near 1 MB means the page never loaded.
