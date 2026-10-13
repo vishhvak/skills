@@ -41,6 +41,11 @@ Build these first and keep them; together they removed every task over 50 ms fro
    neighbours (3 either side) so memory never scales with the number of events.
 7. **Background at bounded resolution.** The heavy noise shader renders at no more than about 2.5 Mpx and is
    upscaled; a resolution governor lowers it under load.
+   - A second governor times whole frames, every other frame. When a GPU misses the frame budget, it lowers the
+     backbuffer pixel cap between transitions and stores it per GPU for the next visit. Transitions draw about three
+     full-screen passes, so they are the frames that miss.
+   - A GPU that meets the budget keeps full resolution.
+   - On a 2-CU integrated GPU at 1440x900 DPR 2, transitions went from 9 ms to under 5.6 ms on a returning visit.
 8. **Composited CSS only.** Infinite CSS animations only on `transform` and `opacity`; prime a tween's `from`
    value inline so GSAP never reads computed style during a frame.
 9. **Browser-specific decode-ahead.** On WebKit, decode linked pages' images on hover, press or focus, not on
