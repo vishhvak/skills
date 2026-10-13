@@ -483,8 +483,9 @@ async function serve() {
   const holder = registry().find((x) => x.port === port);
   if (holder && holder.owner !== owner) { out(`PORT_TAKEN: ${port} belongs to ${holder.owner} (pid ${holder.pid}). Pick another port; leave theirs running.`); process.exit(3); }
   if (holder) return out(`SERVING http://${host}:${port}/ (already up, pid ${holder.pid}, owner ${owner})`);
-  fs.mkdirSync(SW, { recursive: true });
-  const log = fs.openSync(path.join(SW, 'servers.log'), 'a');
+  // Outside a storyworld project the log goes to the temp dir, so serving never creates .storyworld/.
+  const logFile = fs.existsSync(SW) ? path.join(SW, 'servers.log') : path.join(os.tmpdir(), 'storyworld-servers.log');
+  const log = fs.openSync(logFile, 'a');
   const child = spawn(process.execPath, [SELF, 'serve', dir, '--child', '--port', String(port), '--host', host], { detached: true, stdio: ['ignore', log, log] });
   child.unref();
   for (let i = 0; i < 40; i++) {
@@ -496,7 +497,7 @@ async function serve() {
     await new Promise((r) => setTimeout(r, 250));
   }
   try { process.kill(child.pid); } catch {}
-  out(`FAILED: nothing answered on ${host}:${port} (see .storyworld/servers.log). A process outside storyworld may hold the port.`);
+  out(`FAILED: nothing answered on ${host}:${port} (see ${logFile}). A process outside storyworld may hold the port.`);
   process.exit(3);
 }
 

@@ -45,6 +45,15 @@ Measure on the nearest stand-in the host has, label it as a stand-in, and keep t
 | A high-refresh display | `--disable-gpu-vsync --disable-frame-rate-limit`: the frame loop runs uncapped. Check that every active window stays smooth, and that every per-frame smoothing step is scaled by elapsed time (`1 - (1 - a) ** (dt * 60)`), not applied once per frame |
 | Safari | WebKit through Playwright, for crashes and relative pacing only (see "Noise" below) |
 
+To carry a stand-in's GPU time over to the budget's device:
+
+- Time each draw with its own `EXT_disjoint_timer_query`, labelled by shader and target size, to find the passes that cost
+  the most.
+- Scale from the weak GPU, never from a fast one. A desktop GPU under 1 ms per frame is bound by fixed per-pass overhead:
+  one integrated GPU was 86x weaker by FP32, but only 10 to 26x slower on the same frames.
+- Check that the pass is throughput-bound before scaling by FP32 and texture rate. Bytes moved divided by pass time far
+  below the memory bandwidth means it is. Label the scaled figure INFERRED and keep the device untested.
+
 ## Protocol
 
 1. **One timing at a time, on a quiet host.** Wrap every timing command in
