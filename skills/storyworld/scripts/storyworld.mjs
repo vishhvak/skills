@@ -124,6 +124,8 @@ const PRE = {
       ...(v.noHero ? [`${v.noHero} hand-written events have no hero image (mediaIds); each needs one before this gate`] : [])];
   },
   build: () => ['ARCHITECTURE.md', 'CONTRACTS.md'].filter((f) => !fs.existsSync(path.join(ROOT, f))).map((f) => `${f} missing at the project root`),
+  preview: (ev = []) => ev.filter((f) => !/https?:\/\/\S+/.test(read(path.resolve(ROOT, f))))
+    .map((f) => `${f} has no URL of the served build`),
   flow: (ev = []) => ['chromium', 'firefox', 'webkit'].flatMap((b) => {
     const f = ev.find((e) => path.basename(e).toLowerCase().includes(b));
     if (!f) return [`no --evidence log named for ${b}`];
@@ -160,7 +162,7 @@ function status() {
   if (phase.domain) out(`load: ${DOMAIN}${fs.existsSync(DOMAIN) ? '' : `   (missing: write it with the headings of ${path.join(SKILL, 'templates/domain.md')})`}`);
   out(`do: ${phase.does}`);
   if (regressed) out('BLOCKED: content regressed after its gate passed. Fix validate before any other phase.');
-  const unmet = phase.id === 'flow' ? [] : PRE[phase.id]();
+  const unmet = phase.id === 'flow' || !PRE[phase.id] ? [] : PRE[phase.id]();
   for (const u of unmet) if (!u.startsWith('undecided: ') && !u.startsWith('round cap')) out(`BLOCKED: ${u}`);
   const boxes = phase.id === 'brief' ? openBoxes(path.join(SW, 'brief.md')) : [];
   if (boxes.length) out(`ASK_USER: send these ${boxes.length} questions in one message, then stop until the user answers:\n` + boxes.map((b) => '  ' + b).join('\n'));
