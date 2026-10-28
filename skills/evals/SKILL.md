@@ -1,11 +1,11 @@
 ---
 name: evals
-description: "Evals: build, audit and hillclimb evals for any LLM-powered task (a prompt, a tool schema, a skill, an agent, a plugin, a pipeline) on any model, provider or gateway. Use when the user wants to measure an LLM feature, turn failures into test cases, check whether an eval can be trusted, compare models on one, improve something against one (hillclimb), or cut context, cost or latency without regressions."
+description: "Evals: interview the user, then build, audit and hillclimb evals for any LLM-powered task (a prompt, a tool schema, a skill, an agent, a plugin, a pipeline) on any model, provider or gateway. Use when the user wants to measure an LLM feature, turn failures into test cases, check whether an eval can be trusted, compare models on one, improve something against one (hillclimb), or cut context, cost or latency without regressions."
 ---
 
 # Evals
 
-An **eval** is three things: **cases** (inputs the user agrees are the ones that matter), an **adapter** (a command that runs the app on one case with a given model), and **graders** (commands that score one output). The script `{baseDir}/scripts/evals.mjs` owns measurement: it runs trials, resumes, separates infrastructure failures from model failures, computes intervals and verdicts, and keeps state. You own judgment: which cases, what good means, which change to try next. The script never calls a model itself, so any model id the user's setup can serve works: a gateway route, a local proxy, a vendor API, a CLI agent.
+An **eval** is a **brief** (what the user wants measured, in their words, drawn out by interview) and three things built from it: **cases** (inputs that each test a brief item), an **adapter** (a command that runs the app on one case with a given model), and **graders** (commands that score one output). The script `{baseDir}/scripts/evals.mjs` owns measurement: it runs trials, resumes, separates infrastructure failures from model failures, computes intervals and verdicts, and keeps state. You own judgment: which cases, what good means, which change to try next. The script never calls a model itself, so any model id the user's setup can serve works: a gateway route, a local proxy, a vendor API, a CLI agent.
 
 ## Start every session here
 
@@ -42,17 +42,18 @@ A request often chains modes. "Bench Sonnet, climb until it's perfect, add Sol, 
 
 ## Gates
 
-Five gates come before any number is trusted. `status` enforces their order.
+Six gates come before any number is trusted. `status` enforces their order.
 
 | # | Gate | Done when |
 |---|---|---|
-| 1 | `inputs` | The user read every case and said yes (`signoff inputs --note "<their words>"`) |
-| 2 | `smoke` | `smoke` is GREEN: known-good outputs pass, wrong and empty outputs fail |
-| 3 | `grading` | The user saw pilot outputs beside their grades and would not score any differently (`signoff grading`) |
-| 4 | `approve` | The audit's findings are written and reported, and the user approved the harness (`approve --audit <file> --note "<their words>"`) |
-| 5 | `baseline` | Every model in eval.json has a complete baseline under the approved harness |
+| 1 | `brief` | The interview filled every slot of brief.md in the user's words, and they signed it off (`signoff brief --note "<their words>"`) |
+| 2 | `inputs` | Every brief failure, dealbreaker and edge case has a case, no answer is still the agent's guess, and the user read every case and said yes |
+| 3 | `smoke` | `smoke` is GREEN: known-good outputs pass, wrong and empty outputs fail |
+| 4 | `grading` | The user saw pilot outputs beside their grades and would not score any differently (`signoff grading`) |
+| 5 | `approve` | The audit's findings are written and reported, and the user approved the harness (`approve --audit <file> --note "<their words>"`) |
+| 6 | `baseline` | Every model in eval.json has a complete baseline under the approved harness |
 
-**Stop at every gate.** Gates 1, 3 and 4 are the user's decisions: quote their actual words in `--note`, and never write a note on their behalf. A GREEN smoke is evidence for gate 2 only, never permission to record gate 3. Compressing gates 1 to 4 into one push is the dominant failure mode: it produces an eval that runs and that nobody trusts.
+**Stop at every gate.** Gates 1, 2, 4 and 5 are the user's decisions: quote their actual words in `--note`, and never write a note on their behalf. A GREEN smoke is evidence for gate 3 only, never permission to record gate 4. Writing cases before the brief is signed, or compressing gates 1 to 5 into one push, is the dominant failure mode: it produces an eval of your idea of the flow, which runs and which nobody trusts.
 
 ## Commands
 
@@ -62,8 +63,9 @@ All are `node {baseDir}/scripts/evals.mjs <command> [--eval <dir>]`.
 |---|---|
 | `status` | The phase, what to load, open conditions, the next command |
 | `init --name <flow> [--dir <path>]` | Scaffolds `evals/<flow>/`: eval.json, cases.jsonl, expected.jsonl, a stub adapter, a check grader |
+| `brief` | Creates brief.md from the template; reports open slots and brief items no case tests yet |
 | `check` | Validates config, cases and answers; prints the `tags[0]` distribution |
-| `cases` | Writes `runs/cases.md`: every case and its answer, for the inputs gate |
+| `cases` | Writes `runs/cases.md`: each brief item beside the cases that test it, guessed answers still open, every case and its answer |
 | `show --variant <name> [--failures]` | Prints each trial's input, output, grade and the grader's reason |
 | `smoke` | Grades known-good (`expected.reference`), wrong (`expected.wrong`) and empty outputs. Free |
 | `run --variant <name> [--model m,m \| --models all] [--reps R] [--cases all\|train\|test\|ids] [--limit N] [--dry-run]` | Runs trials. Prints the scope and estimated cost first, resumes at (case, rep), writes `runs/<variant>/<model>/` |
@@ -73,7 +75,7 @@ All are `node {baseDir}/scripts/evals.mjs <command> [--eval <dir>]`.
 | `score [--vs <variant>] [--split test\|train\|all]` | The numbers: per variant and model, mean ±95% interval over cases, paired deltas, the noise floor, KEEP/REVERT verdicts, spend |
 | `record --variant <name> --decision keep\|revert\|control\|stall --change "<one line>"` | Closes a round |
 | `report` | Writes `runs/report.html`: summary, rounds, per-case grid with links to traces |
-| `signoff inputs\|grading\|plan --note "..."` / `approve --audit <file> --note "..."` | Records the user's decisions |
+| `signoff brief\|inputs\|grading\|plan --note "..."` / `approve --audit <file> --note "..."` | Records the user's decisions |
 
 ## Rules every mode needs
 

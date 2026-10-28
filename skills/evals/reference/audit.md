@@ -2,7 +2,7 @@
 
 Before an eval chooses a model, a prompt or a configuration, check that the eval is sound. The most surprising eval results usually turn out to be bugs in the eval. Audit against the actual code, data and a real run, not the README; if nothing has run recently, run a few cases first.
 
-Use this file in three places: as construction requirements while building, as the gate-4 audit before the baseline, and as the first pass on an eval someone else built (wrap that eval with an adapter whose output matches the contract, or audit it in place).
+Use this file in three places: as construction requirements while building, as the audit at the approve gate, and as the first pass on an eval someone else built (wrap that eval with an adapter whose output matches the contract, or audit it in place). An eval built elsewhere still gets a brief: draft brief.md from its cases and graders, mark what you inferred, and interview the user on every inferred line and every gap before they sign it off.
 
 ## What the runner already guarantees
 

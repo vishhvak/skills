@@ -117,7 +117,7 @@ function saveState(ev) { writeJson(path.join(ev.dir, 'state.json'), ev.state); }
 // The files whose change makes earlier numbers incomparable: the config,
 // the cases and answers, every harness path, and this runner.
 function harnessFiles(ev) {
-  const files = ['eval.json', ev.config.cases || 'cases.jsonl'];
+  const files = ['eval.json', 'brief.md', ev.config.cases || 'cases.jsonl'];
   if (ev.config.expected) files.push(ev.config.expected);
   for (const p of ev.config.harness_paths || []) files.push(p);
   const hashes = {};
@@ -170,11 +170,60 @@ function appFingerprint(ev) {
   return `${head.slice(0, 12)}+${h.digest('hex').slice(0, 12)}`;
 }
 
+// ---------- the brief: what the user wants measured ----------
+
+const BRIEF_ITEM = /^\s*[-*]\s*\**([FDEJ]\d+)\**\s*[:.)]\s*(.*)$/;
+const COVERED_KINDS = new Set(['F', 'D', 'E']);
+
+function readBrief(ev) {
+  const file = path.join(ev.dir, 'brief.md');
+  if (!fs.existsSync(file)) return { exists: false, fills: 0, proposed: [], items: new Map() };
+  const text = fs.readFileSync(file, 'utf8');
+  const items = new Map();
+  for (const line of text.split('\n')) {
+    const m = line.match(BRIEF_ITEM);
+    if (m && !m[2].includes('<fill>')) items.set(m[1], m[2].trim());
+  }
+  const proposed = text.split('\n').filter((l) => /(?<![`"])\(proposed\)/.test(l)).map((l) => l.replace(/^\s*[-*]\s*/, '').trim());
+  return { exists: true, fills: (text.match(/<fill>/g) || []).length, proposed, items };
+}
+
+const whyOf = (c) => (Array.isArray(c.why) ? c.why : c.why ? String(c.why).split(/[,\s]+/) : []).filter(Boolean);
+
+// Every failure, dealbreaker and edge case the user named needs a case.
+function uncovered(ev, brief) {
+  const cited = new Set(ev.cases.flatMap(whyOf));
+  return [...brief.items.keys()].filter((id) => COVERED_KINDS.has(id[0]) && !cited.has(id));
+}
+
+// What the user reviews at the inputs gate: the brief, the cases and their answers.
+function casesSha(ev) {
+  const read = (f) => (f && fs.existsSync(path.join(ev.dir, f)) ? fs.readFileSync(path.join(ev.dir, f)) : '');
+  return sha(Buffer.concat([Buffer.from(read('brief.md')), Buffer.from(read(ev.config.cases || 'cases.jsonl')), Buffer.from(read(ev.config.expected))]));
+}
+
+// Every J item (how the user judges by eye) must show up in what the graders
+// produce or read: a metric name, an explanation, or a rubric.
+function ungradedCriteria(ev) {
+  const brief = readBrief(ev);
+  const seen = [];
+  for (const run of listRuns(ev).filter((r) => isPilot(r.variant))) {
+    for (const row of readJsonl(path.join(run.dir, 'results.jsonl'))) seen.push(Object.keys(row.grade || {}).join(' '), JSON.stringify(row.explanation || {}));
+  }
+  for (const e of ev.expected.values()) if (e.rubric) seen.push(JSON.stringify(e.rubric));
+  for (const p of ev.config.harness_paths || []) if (/\.(md|txt)$/.test(p) && fs.existsSync(path.resolve(ev.dir, p))) seen.push(fs.readFileSync(path.resolve(ev.dir, p), 'utf8'));
+  const text = seen.join(' ').toLowerCase();
+  return [...brief.items.keys()].filter((id) => id[0] === 'J' && !new RegExp(`\\b${id.toLowerCase()}(\\b|_)`).test(text));
+}
+
+const agentAnswers = (ev) => [...ev.expected.values()].filter((e) => e.by === 'agent').map((e) => e.id);
+
 function problems(ev) {
   const out = [];
   const { config, cases, expected } = ev;
   if (!config.run?.command) out.push('eval.json has no run.command (the adapter that runs the app on one case)');
   if (!(config.graders || []).length) out.push('eval.json has no graders');
+  if (String(config.description || '').includes('<fill')) out.push('eval.json description is still the placeholder; write the flow and what good looks like, from the brief');
   if (!cases.length) out.push(`${config.cases || 'cases.jsonl'} has no cases`);
   const seen = new Map();
   for (const c of cases) {
@@ -185,6 +234,14 @@ function problems(ev) {
     const s = safeId(c.id);
     if (seen.has(s)) out.push(`case ids ${seen.get(s)} and ${c.id} collide as file names`);
     seen.set(s, c.id);
+  }
+  if (ev.state.signoffs?.brief) {
+    const brief = readBrief(ev);
+    for (const c of cases) {
+      const why = whyOf(c);
+      if (!why.length) out.push(`case ${c.id} has no why: name the brief item it tests (F1, D2, E3)`);
+      for (const id of why) if (!brief.items.has(id)) out.push(`case ${c.id} cites ${id}, which brief.md does not define`);
+    }
   }
   if (config.expected) {
     for (const c of cases) if (!expected.has(String(c.id))) out.push(`case ${c.id} has no row in ${config.expected}`);
@@ -337,6 +394,7 @@ commands.init = (args) => {
   const t = (f) => path.join(SKILL_DIR, 'templates', f);
   fs.copyFileSync(t('adapter-stub.mjs'), path.join(dir, 'adapter.mjs'));
   fs.copyFileSync(t('grader-check.mjs'), path.join(dir, 'graders', 'check.mjs'));
+  fs.copyFileSync(t('brief.md'), path.join(dir, 'brief.md'));
   writeJson(path.join(dir, 'eval.json'), {
     name,
     description: '<fill: the one flow this measures and what good looks like>',
@@ -360,8 +418,18 @@ commands.init = (args) => {
   ].map((c) => JSON.stringify(c)).join('\n') + '\n');
   fs.writeFileSync(path.join(dir, '.gitignore'), 'runs/\n');
   console.log(`CREATED: ${dir}`);
-  console.log('do: write the real cases and answers, wire adapter.mjs to the app and graders/check.mjs to the output, fill eval.json (reference/build.md)');
+  console.log('do: interview the user and fill brief.md before writing any case (reference/build.md, section "Interview")');
   console.log(`then: node ${SELF} status --eval ${path.relative(process.cwd(), dir) || '.'}`);
+};
+
+commands.brief = (args) => {
+  const ev = load(args);
+  const file = path.join(ev.dir, 'brief.md');
+  if (!fs.existsSync(file)) { fs.copyFileSync(path.join(SKILL_DIR, 'templates', 'brief.md'), file); console.log(`CREATED: ${file}`); }
+  const b = readBrief(ev);
+  console.log(`brief: ${b.fills} <fill> slots left; items: ${[...b.items.keys()].join(' ') || '(none)'}`);
+  const gaps = uncovered(ev, b);
+  if (ev.cases.length && gaps.length) console.log(`uncovered: ${gaps.map((id) => `${id} (${b.items.get(id).slice(0, 50)})`).join('; ')}`);
 };
 
 commands.check = (args) => {
@@ -420,11 +488,29 @@ commands.smoke = async (args) => {
 commands.signoff = (args) => {
   const ev = load(args);
   const what = args._[1];
-  if (!['inputs', 'grading', 'plan'].includes(what) || typeof args.note !== 'string') {
-    die('usage: signoff inputs|grading|plan --note "<the user\'s words, quoted>"');
+  if (!['brief', 'inputs', 'grading', 'plan'].includes(what) || typeof args.note !== 'string') {
+    die('usage: signoff brief|inputs|grading|plan --note "<the user\'s words, quoted>"');
+  }
+  if (what === 'brief') {
+    const b = readBrief(ev);
+    if (!b.exists) die('BLOCKED: no brief.md; create it with the brief command and interview the user');
+    if (b.fills) die(`BLOCKED: brief.md has ${b.fills} <fill> slots left; ask the user for each`);
+    if (b.proposed.length) die(`BLOCKED: ${b.proposed.length} line(s) are still your proposal: ${b.proposed.map((l) => `"${l.slice(0, 60)}"`).join('; ')}. Show each to the user; on their yes remove "(proposed)", or write their correction`);
+  }
+  if (what === 'grading') {
+    const missing = ungradedCriteria(ev);
+    if (missing.length) die(`BLOCKED: brief criteria no grader scores yet: ${missing.join(', ')}. Name a metric after each (j1_...), or cite it in a rubric criterion, and rerun the pilot`);
+  }
+  if (what === 'inputs') {
+    if (!ev.state.signoffs?.brief) die('BLOCKED: the brief gate is open (signoff brief)');
+    const gaps = uncovered(ev, readBrief(ev));
+    if (gaps.length) die(`BLOCKED: brief items with no case: ${gaps.join(', ')}; write a case for each or ask the user to drop the item`);
+    if (ev.state.shown_cases !== casesSha(ev)) die(`BLOCKED: the user has not been given the current cases: run the cases command, give them runs/cases.md, and sign off on that version`);
+    const guessed = agentAnswers(ev);
+    if (guessed.length) die(`BLOCKED: ${guessed.length} answer${guessed.length === 1 ? ' is' : 's are'} the agent's guess (by: "agent"): ${guessed.slice(0, 10).join(', ')}${guessed.length > 10 ? ', ...' : ''}. Settle each with the user, then mark it by: "user"`);
   }
   ev.state.signoffs ||= {};
-  ev.state.signoffs[what] = { at: now(), note: args.note, harness_sha: harnessDrift(ev).sha };
+  ev.state.signoffs[what] = { at: now(), note: args.note, harness_sha: harnessDrift(ev).sha, ...(what === 'brief' || what === 'inputs' ? { cases_sha: casesSha(ev) } : {}) };
   saveState(ev);
   console.log(`RECORDED: signoff ${what}`);
 };
@@ -976,16 +1062,31 @@ const fenced = (v) => { const t = asText(v ?? ''); const run = Math.max(2, ...(t
 
 commands.cases = (args) => {
   const ev = load(args);
-  const out = [`# ${ev.config.name}: ${ev.cases.length} cases`, '', '| id | tags | input | expected |', '|---|---|---|---|'];
-  for (const c of ev.cases) out.push(`| ${c.id} | ${(c.tags || []).join(', ')} | ${oneLine(c.input, 80)} | ${oneLine(ev.expected.get(String(c.id)) ? Object.fromEntries(Object.entries(ev.expected.get(String(c.id))).filter(([k]) => k !== 'id')) : '', 60)} |`);
+  const brief = readBrief(ev);
+  const answer = (c) => { const e = ev.expected.get(String(c.id)); return e ? Object.fromEntries(Object.entries(e).filter(([k]) => k !== 'id' && k !== 'by')) : ''; };
+  const out = [`# ${ev.config.name}: ${ev.cases.length} cases`, ''];
+  if (brief.items.size) {
+    out.push('## What each brief item is tested by', '', '| item | the user said | cases |', '|---|---|---|');
+    for (const [id, text] of brief.items) {
+      if (!COVERED_KINDS.has(id[0])) continue;
+      const ids = ev.cases.filter((c) => whyOf(c).includes(id)).map((c) => c.id);
+      out.push(`| ${id} | ${oneLine(text, 70)} | ${ids.join(', ') || '**none**'} |`);
+    }
+    out.push('');
+  }
+  const guessed = new Set(agentAnswers(ev).map(String));
+  if (guessed.size) out.push(`**${guessed.size} answer${guessed.size === 1 ? ' is' : 's are'} the agent's guess and need${guessed.size === 1 ? 's' : ''} the user's call:** ${[...guessed].join(', ')}`, '');
+  out.push('## Cases', '', '| id | why | tags | input | expected |', '|---|---|---|---|---|');
+  for (const c of ev.cases) out.push(`| ${c.id} | ${whyOf(c).join(' ')} | ${(c.tags || []).join(', ')} | ${oneLine(c.input, 70)} | ${guessed.has(String(c.id)) ? '(guess) ' : ''}${oneLine(answer(c), 50)} |`);
   for (const c of ev.cases) {
-    out.push('', `## ${c.id}`, '', `tags: ${(c.tags || []).join(', ') || '-'}`, '', fenced(c.input));
-    const e = ev.expected.get(String(c.id));
-    if (e) out.push('', 'expected:', '', fenced(Object.fromEntries(Object.entries(e).filter(([k]) => k !== 'id'))));
+    out.push('', `### ${c.id}`, '', `why: ${whyOf(c).map((id) => `${id} (${brief.items.get(id) ?? '?'})`).join('; ') || '-'}`, `tags: ${(c.tags || []).join(', ') || '-'}`, '', fenced(c.input));
+    if (ev.expected.get(String(c.id))) out.push('', `expected${guessed.has(String(c.id)) ? " (the agent's guess)" : ''}:`, '', fenced(answer(c)));
   }
   fs.mkdirSync(ev.runsDir, { recursive: true });
   const file = path.join(ev.runsDir, 'cases.md');
   fs.writeFileSync(file, out.join('\n') + '\n');
+  ev.state.shown_cases = casesSha(ev);
+  saveState(ev);
   console.log(`WROTE: ${file}`);
 };
 
@@ -1081,12 +1182,14 @@ commands.status = (args) => {
   const cmd = (c) => `node ${SELF} ${c} --eval ${rel}`;
   const drift = harnessDrift(ev);
   const s = ev.state;
+  // Before approval, editing the brief, cases or answers reopens the inputs gate.
+  if (s.signoffs?.inputs && drift.status !== 'APPROVED' && s.signoffs.inputs.cases_sha !== casesSha(ev)) delete s.signoffs.inputs;
   const models = ev.config.models?.length ? ev.config.models : ['default'];
   const runs = listRuns(ev).map((r) => loadRun(ev, r));
   console.log(`eval: ${ev.config.name} (${rel})`);
   console.log(`cases: ${ev.cases.length}  models: ${models.join(', ')}  reps: ${ev.config.reps ?? 1}  primary: ${ev.config.primary ?? '(unset)'}`);
   console.log(`harness: ${drift.status}${drift.changed.length ? ` (${drift.changed.join(', ')})` : ''}`);
-  console.log(`signoffs: ${['inputs', 'grading'].map((k) => `${k} ${s.signoffs?.[k] ? 'yes' : 'no'}`).join(', ')}  smoke: ${s.smoke ? (s.smoke.green ? 'GREEN' : 'BLOCKED') : 'not run'}`);
+  console.log(`signoffs: ${['brief', 'inputs', 'grading'].map((k) => `${k} ${s.signoffs?.[k] ? 'yes' : 'no'}`).join(', ')}  smoke: ${s.smoke ? (s.smoke.green ? 'GREEN' : 'BLOCKED') : 'not run'}`);
   for (const r of runs) {
     const exp = (r.meta.cases || []).length * (r.meta.reps || 1);
     const resolved = new Set(r.rows.map((x) => `${x.case_id}#${x.rep}`));
@@ -1098,9 +1201,18 @@ commands.status = (args) => {
   if (s.rounds?.length) console.log(`rounds: ${s.rounds.length} (best: ${s.best || 'baseline'})`);
 
   const phase = (name, lines) => { console.log(`phase: ${name}`); lines.forEach((l) => console.log(l)); };
+  const brief = readBrief(ev);
+  if (!s.signoffs?.brief) {
+    if (!brief.exists) return phase('brief', ['load: reference/build.md (section "Interview")', `do: create brief.md: ${cmd('brief')}`]);
+    if (brief.fills || brief.proposed.length) return phase('brief', ['load: reference/build.md (section "Interview")', ...(brief.fills ? [`BLOCKED: brief.md has ${brief.fills} <fill> slots left`] : []), ...brief.proposed.map((l) => `BLOCKED: still your proposal, not the user's answer: ${l.slice(0, 90)}`), 'ASK_USER: the next unfilled section, as one question that opens with a concrete example; write their answer into brief.md in their words, then ask the next']);
+    return phase('brief', ['load: reference/build.md (section "Interview")', 'ASK_USER: show the user the whole brief and ask whether it says what they want measured; fix what they name', `next: ${cmd('signoff brief --note "<their words>"')}`]);
+  }
   const p = problems(ev);
   if (p.length) return phase('build', [...p.map((x) => `BLOCKED: ${x}`), 'load: reference/build.md']);
   if (ev.cases.length < 15) console.log(`WARN: ${ev.cases.length} cases; aim for 15-100 before trusting a number`);
+  const gaps = uncovered(ev, brief);
+  const guessed = agentAnswers(ev);
+  if (!s.signoffs?.inputs && (gaps.length || guessed.length)) return phase('inputs', ['load: reference/build.md (section "Inputs")', ...(gaps.length ? [`BLOCKED: brief items with no case: ${gaps.join(', ')}`] : []), ...(guessed.length ? [`BLOCKED: ${guessed.length} answer${guessed.length === 1 ? ' is' : 's are'} the agent's guess (by: "agent"): ${guessed.slice(0, 10).join(', ')}`] : []), 'do: write a case for each uncovered item; settle each guessed answer with the user (quote the case) and mark it by: "user"']);
   if (!s.signoffs?.inputs) return phase('inputs', ['load: reference/build.md (section "Inputs")', `do: write the review file with ${cmd('cases')} and give the user its path`, 'ASK_USER: are these the cases you care about, with the right answers? What is missing? Fix what they name, rewrite the file, ask again', `next: ${cmd('signoff inputs --note "<their words>"')}`]);
   if (!s.smoke || s.smoke.harness_sha !== drift.sha) return phase('smoke', ['do: test the graders on known-good, wrong and empty outputs (free: no model calls)', `next: ${cmd('smoke')}`]);
   if (!s.smoke.green) return phase('smoke', ['BLOCKED: the last smoke run failed; fix the grader or the references, then rerun', `next: ${cmd('smoke')}`]);
