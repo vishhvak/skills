@@ -1,11 +1,13 @@
 ---
 name: animated-diagrams
-description: Build interactive SVG and HTML diagrams for any subject, or recreate animated diagrams from video. Use for routing graphs, live tables, pipelines, editable document demos, and visuals embedded in narrated tutorials.
+description: Build interactive SVG and HTML diagrams or rendered explainer videos for any subject, or recreate animated diagrams from video. Use for routing graphs, live tables, pipelines, editable document demos, visuals embedded in narrated tutorials, and MP4 explainers or reels made with Psychopomp.
 ---
 
 # Animated diagrams
 
-Build editable web scenes with real SVG paths, shapes and text, plus HTML where native editing or layout helps. The standalone starter uses vanilla JavaScript and CSS; integrate with an existing app's framework when requested. Original recordings are comparison evidence, not the recreation's rendering or soundtrack.
+Two deliverables share this skill. A **web scene** is an editable page with real SVG paths, shapes and text, plus HTML where native editing or layout helps; it lives inside a site, a lesson or a game. A **video** is an MP4 explainer rendered by Psychopomp, the Rust engine the web scenes' visual style comes from. Choose by where the result is watched; when both are wanted, make the video and embed a web scene beside it only where interaction teaches something the film cannot.
+
+For web scenes, the standalone starter uses vanilla JavaScript and CSS; integrate with an existing app's framework when requested. Original recordings are comparison evidence, not the recreation's rendering or soundtrack.
 
 This procedure supports Claude Code and Codex and assumes a fast, inexpensive model. `{baseDir}` is this skill's directory. Run scripts from the destination project and follow their reported results. Keep generated code, source analysis and verification artifacts in that project.
 
@@ -16,6 +18,7 @@ This procedure supports Claude Code and Codex and assumes a fast, inexpensive mo
 | Build a diagram for a new subject | [authoring.md](references/authoring.md) and [patterns.md](references/patterns.md) |
 | Recreate a supplied recording | [video-analysis.md](references/video-analysis.md), then [patterns.md](references/patterns.md) and [fidelity.md](references/fidelity.md) |
 | Embed a diagram in an existing app or narrated lesson | [integration.md](references/integration.md); preserve the host framework and playback clock |
+| Make an explainer video, reel or slideshow (MP4) | [psychopomp.md](references/psychopomp.md); the steps below are for web scenes |
 
 The bundle has five editable examples: branching routes, a live workspace, a model table, a registry pipeline, and an editable document. They provide implementation patterns; adapt their data and interactions to the requested subject.
 
